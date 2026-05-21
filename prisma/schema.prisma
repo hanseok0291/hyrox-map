@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Venue {
+  id               String    @id @default(cuid())
+  name             String
+  slug             String    @unique
+  address          String
+  region           String
+  lat              Float
+  lng              Float
+  venueType        String    @map("venue_type")
+  trustLevel       String    @map("trust_level")
+  source           String
+  tags             String
+  outdoorRunNote   String?   @map("outdoor_run_note")
+  dropInInfo       String?   @map("drop_in_info")
+  priceNote        String?   @map("price_note")
+  dropInAvailable  Boolean   @default(false) @map("drop_in_available")
+  links            String
+  officialClubId   String?   @map("official_club_id")
+  experienceNote   String?   @map("experience_note")
+  publishedAt      DateTime? @map("published_at")
+  flagged          Boolean   @default(false)
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  reports          Report[]  @relation("MergedVenue")
+
+  @@index([lat, lng])
+  @@index([region])
+  @@index([publishedAt])
+  @@map("venues")
+}
+
+model Report {
+  id                 String    @id @default(cuid())
+  name               String
+  address            String
+  region             String?
+  lat                Float
+  lng                Float
+  venueType          String    @map("venue_type")
+  experienceNote     String    @map("experience_note")
+  tags               String
+  evidenceUrls       String    @map("evidence_urls")
+  dropInInfo         String?   @map("drop_in_info")
+  priceNote          String?   @map("price_note")
+  reporterContact    String?   @map("reporter_contact")
+  website            String?
+  instagram          String?
+  status             String    @default("submitted")
+  moderatorNote      String?   @map("moderator_note")
+  reporterMessage    String?   @map("reporter_message")
+  reviewedAt         DateTime? @map("reviewed_at")
+  mergedIntoVenueId  String?   @map("merged_into_venue_id")
+  mergedIntoVenue    Venue?    @relation("MergedVenue", fields: [mergedIntoVenueId], references: [id])
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@map("reports")
+}
