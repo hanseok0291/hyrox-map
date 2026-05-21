@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { FilterSheet, type VenueFilters } from "@/components/FilterSheet";
 import { MapView } from "@/components/MapView";
+import { VenueMapOverlay } from "@/components/VenueMapOverlay";
 import { VenueList } from "@/components/VenueList";
 import type { VenueDTO } from "@/lib/types";
 
@@ -55,13 +56,19 @@ export default function HomePage() {
     <div className="mx-auto flex max-w-6xl flex-col lg:h-[calc(100vh-4rem)] lg:flex-row">
       <div className="lg:w-[58%]">
         <FilterSheet filters={filters} onChange={setFilters} />
-        <div className="h-[40vh] lg:h-[calc(100%-12rem)]">
+        <div className="relative h-[40vh] lg:h-[calc(100%-12rem)]">
           <MapView
             venues={venues}
             center={center}
             selectedId={selectedVenue?.id ?? null}
             onSelect={setSelectedVenue}
           />
+          {selectedVenue && (
+            <VenueMapOverlay
+              venue={selectedVenue}
+              onClose={() => setSelectedVenue(null)}
+            />
+          )}
         </div>
         <div className="border-t border-zinc-200 bg-white px-4 py-2 lg:hidden">
           <button
@@ -85,7 +92,11 @@ export default function HomePage() {
           근처 시설 {loading ? "…" : `(${venues.length})`}
         </h2>
         <div className="max-h-[50vh] overflow-y-auto lg:max-h-none lg:flex-1">
-          <VenueList venues={venues} loading={loading} />
+          <VenueList
+            venues={venues}
+            loading={loading}
+            selectedId={selectedVenue?.id ?? null}
+          />
         </div>
       </aside>
     </div>

@@ -2,11 +2,22 @@ import Link from "next/link";
 import type { VenueDTO } from "@/lib/types";
 import { TAG_LABELS, TRUST_LABELS } from "@/lib/types";
 
-export function VenueCard({ venue }: { venue: VenueDTO }) {
+export function VenueCard({
+  venue,
+  selected,
+}: {
+  venue: VenueDTO;
+  selected?: boolean;
+}) {
   return (
     <Link
       href={`/venues/${venue.slug}`}
-      className="block rounded-lg border border-zinc-200 bg-white p-4 shadow-sm transition hover:border-orange-400"
+      id={`venue-card-${venue.id}`}
+      className={`block rounded-lg border bg-white p-4 shadow-sm transition ${
+        selected
+          ? "border-orange-500 ring-2 ring-orange-200"
+          : "border-zinc-200 hover:border-orange-400"
+      }`}
     >
       <div className="flex items-start justify-between gap-2">
         <h3 className="font-semibold text-zinc-900">{venue.name}</h3>

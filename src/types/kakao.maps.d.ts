@@ -18,6 +18,13 @@ declare namespace kakao.maps {
     level?: number;
   }
 
+  class InfoWindow {
+    constructor(options: { content?: string | HTMLElement; removable?: boolean });
+    setContent(content: string | HTMLElement): void;
+    open(map: Map, marker: Marker): void;
+    close(): void;
+  }
+
   class Marker {
     constructor(options: MarkerOptions);
     setMap(map: Map | null): void;

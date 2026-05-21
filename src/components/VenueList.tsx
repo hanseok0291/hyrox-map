@@ -1,15 +1,24 @@
 "use client";
 
+import { useEffect } from "react";
 import type { VenueDTO } from "@/lib/types";
 import { VenueCard } from "./VenueCard";
 
 export function VenueList({
   venues,
   loading,
+  selectedId,
 }: {
   venues: VenueDTO[];
   loading?: boolean;
+  selectedId?: string | null;
 }) {
+  useEffect(() => {
+    if (!selectedId || loading) return;
+    const el = document.getElementById(`venue-card-${selectedId}`);
+    el?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [selectedId, loading]);
+
   if (loading) {
     return (
       <div className="flex flex-col gap-3 p-4">
@@ -35,7 +44,7 @@ export function VenueList({
   return (
     <div className="flex flex-col gap-3 overflow-y-auto p-4">
       {venues.map((v) => (
-        <VenueCard key={v.id} venue={v} />
+        <VenueCard key={v.id} venue={v} selected={v.id === selectedId} />
       ))}
     </div>
   );
