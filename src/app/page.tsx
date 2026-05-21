@@ -2,8 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { VenueFilters } from "@/components/FilterSheet";
+import { MapMobileChrome } from "@/components/MapMobileChrome";
 import { MapSidebar } from "@/components/MapSidebar";
 import { MapView } from "@/components/MapView";
+import { VenueListSheet } from "@/components/VenueListSheet";
 import { VenueMapOverlay } from "@/components/VenueMapOverlay";
 import type { VenueDTO } from "@/lib/types";
 
@@ -15,6 +17,8 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [selectedVenue, setSelectedVenue] = useState<VenueDTO | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [listSheetOpen, setListSheetOpen] = useState(false);
+  const [listSheetTab, setListSheetTab] = useState<"list" | "filter">("list");
   const [filters, setFilters] = useState<VenueFilters>({
     q: "",
     venueType: "",
@@ -62,9 +66,18 @@ export default function HomePage() {
     );
   };
 
+  const openList = () => {
+    setListSheetTab("list");
+    setListSheetOpen(true);
+  };
+
+  const openFilter = () => {
+    setListSheetTab("filter");
+    setListSheetOpen(true);
+  };
+
   return (
     <div className="relative h-dvh w-full">
-      {/* Full-screen map */}
       <div className="absolute inset-0">
         <MapView
           venues={venues}
@@ -74,7 +87,7 @@ export default function HomePage() {
         />
       </div>
 
-      {/* Floating sidebar (PC) / top panel area (mobile uses full width sidebar overlay) */}
+      {/* Desktop: left sidebar */}
       <MapSidebar
         filters={filters}
         onFiltersChange={setFilters}
@@ -87,7 +100,30 @@ export default function HomePage() {
         onCollapsedChange={setSidebarCollapsed}
       />
 
-      {/* Mobile-only bottom card when marker selected */}
+      {/* Mobile: floating top + bottom chrome */}
+      <MapMobileChrome
+        filters={filters}
+        onFiltersChange={setFilters}
+        venueCount={venues.length}
+        loading={loading}
+        onOpenList={openList}
+        onOpenFilter={openFilter}
+        onMyLocation={handleMyLocation}
+      />
+
+      <VenueListSheet
+        open={listSheetOpen}
+        onClose={() => setListSheetOpen(false)}
+        filters={filters}
+        onFiltersChange={setFilters}
+        venues={venues}
+        loading={loading}
+        selectedId={selectedVenue?.id ?? null}
+        onVenueSelect={setSelectedVenue}
+        initialTab={listSheetTab}
+      />
+
+      {/* Mobile: marker detail card (above bottom nav) */}
       {selectedVenue && (
         <div className="lg:hidden">
           <VenueMapOverlay

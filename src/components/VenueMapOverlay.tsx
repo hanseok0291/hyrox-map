@@ -19,7 +19,7 @@ export function VenueMapOverlay({
       : null;
 
   return (
-    <div className="pointer-events-auto absolute bottom-3 left-3 right-3 z-10 rounded-xl border border-zinc-200 bg-white p-4 shadow-lg sm:left-auto sm:right-3 sm:max-w-sm">
+    <div className="pointer-events-auto absolute bottom-[calc(5.75rem+env(safe-area-inset-bottom))] left-3 right-3 z-20 rounded-xl border border-zinc-200 bg-white p-4 shadow-lg lg:bottom-3 lg:z-10 lg:max-w-sm lg:left-auto lg:right-3">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <h3 className="truncate font-semibold text-zinc-900">{venue.name}</h3>

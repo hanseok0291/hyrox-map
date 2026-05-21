@@ -31,7 +31,7 @@ export function MapSidebar({
       <button
         type="button"
         onClick={() => onCollapsedChange(false)}
-        className="absolute bottom-[min(58dvh,520px)] left-4 z-30 flex h-11 w-11 lg:bottom-auto lg:top-4 items-center justify-center rounded-full bg-[#3d2c24]/95 text-white shadow-lg backdrop-blur-sm hover:bg-[#4a362c]"
+        className="absolute left-4 top-4 z-30 hidden h-11 w-11 items-center justify-center rounded-full bg-[#3d2c24]/95 text-white shadow-lg backdrop-blur-sm hover:bg-[#4a362c] lg:flex"
         aria-label="패널 열기"
       >
         →
@@ -40,8 +40,8 @@ export function MapSidebar({
   }
 
   return (
-    <aside className="pointer-events-none absolute inset-x-0 bottom-0 z-30 flex max-h-[min(58dvh,520px)] flex-col lg:inset-x-auto lg:inset-y-0 lg:left-0 lg:max-h-none lg:max-w-[400px] lg:p-5">
-      <div className="pointer-events-auto flex h-full max-h-full flex-col overflow-hidden rounded-t-2xl bg-[#3d2c24]/95 text-white shadow-2xl backdrop-blur-md lg:rounded-2xl lg:max-h-[calc(100dvh-2.5rem)]">
+    <aside className="pointer-events-none absolute inset-y-0 left-0 z-30 hidden max-w-[400px] flex-col p-5 lg:flex">
+      <div className="pointer-events-auto flex h-full max-h-[calc(100dvh-2.5rem)] flex-col overflow-hidden rounded-2xl bg-[#3d2c24]/95 text-white shadow-2xl backdrop-blur-md">
         {/* Header */}
         <div className="flex items-start justify-between gap-2 border-b border-white/10 px-4 pb-3 pt-4">
           <div>
