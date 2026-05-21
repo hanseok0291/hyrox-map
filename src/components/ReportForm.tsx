@@ -73,7 +73,7 @@ export function ReportForm() {
         <p className="mt-2 text-sm text-zinc-600">
           검수 후 3~5영업일 내 지도에 반영됩니다.
         </p>
-        <a href="/" className="mt-4 inline-block text-sm text-orange-600 underline">
+        <a href="/" className="mt-4 inline-block text-sm font-medium text-zinc-900 underline">
           지도로 돌아가기
         </a>
       </div>
@@ -161,7 +161,7 @@ export function ReportForm() {
               onClick={() => toggleTag(tag)}
               className={`rounded-full px-3 py-1 text-xs ${
                 tags.includes(tag)
-                  ? "bg-orange-500 text-white"
+                  ? "bg-zinc-900 text-white"
                   : "bg-zinc-100 text-zinc-700"
               }`}
             >
@@ -211,7 +211,7 @@ export function ReportForm() {
       <button
         type="submit"
         disabled={status === "loading"}
-        className="w-full rounded-lg bg-orange-500 py-3 font-medium text-white hover:bg-orange-600 disabled:opacity-50"
+        className="w-full rounded-lg bg-zinc-900 py-3 font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
       >
         {status === "loading" ? "제출 중…" : "제보 제출"}
       </button>

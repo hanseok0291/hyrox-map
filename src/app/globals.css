@@ -3,6 +3,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --accent: #171717;
+  --accent-hover: #3f3f46;
 }
 
 @theme inline {
@@ -12,20 +14,20 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: #ffffff;
+  color: #171717;
   font-family: Arial, Helvetica, sans-serif;
 }
 
 html,
 body {
   height: 100%;
+}
+
+/* Sub-pages (detail, report, admin): always light */
+.page-light {
+  background: #ffffff;
+  color: #171717;
+  min-height: 100%;
 }

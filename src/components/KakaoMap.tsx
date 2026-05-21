@@ -23,9 +23,9 @@ function buildInfoWindowContent(venue: VenueDTO): string {
     <div style="padding:8px 4px;min-width:160px;max-width:220px;font-family:sans-serif;">
       <div style="font-weight:600;font-size:14px;color:#18181b;margin-bottom:4px;">${escapeHtml(venue.name)}</div>
       <div style="font-size:12px;color:#52525b;margin-bottom:6px;">${escapeHtml(venue.region)}</div>
-      <div style="font-size:11px;color:#ea580c;margin-bottom:6px;">${distance ? distance + " · " : ""}${escapeHtml(trust)}${dropIn}</div>
+      <div style="font-size:11px;color:#52525b;margin-bottom:6px;">${distance ? distance + " · " : ""}${escapeHtml(trust)}${dropIn}</div>
       ${tags ? `<div style="font-size:11px;color:#71717a;margin-bottom:8px;">${escapeHtml(tags)}</div>` : ""}
-      <a href="/venues/${venue.slug}" style="display:block;text-align:center;background:#f97316;color:#fff;padding:8px;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;">상세 보기</a>
+      <a href="/venues/${venue.slug}" style="display:block;text-align:center;background:#18181b;color:#fff;padding:8px;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;">상세 보기</a>
     </div>
   `;
 }

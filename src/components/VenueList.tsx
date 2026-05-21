@@ -50,7 +50,7 @@ export function VenueList({
         조건에 맞는 시설이 없습니다.{" "}
         <a
           href="/report"
-          className={isSidebar ? "text-orange-300 underline" : "text-orange-600 underline"}
+          className={isSidebar ? "text-white/80 underline" : "text-zinc-900 underline"}
         >
           제보
         </a>

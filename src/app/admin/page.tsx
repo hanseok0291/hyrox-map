@@ -6,7 +6,7 @@ export default function AdminHomePage() {
       <h1 className="text-xl font-bold">Admin</h1>
       <ul className="mt-6 space-y-2">
         <li>
-          <Link href="/admin/reports" className="text-orange-600 underline">
+          <Link href="/admin/reports" className="text-zinc-900 underline">
             제보 큐
           </Link>
         </li>

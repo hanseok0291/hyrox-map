@@ -25,7 +25,7 @@ export function VenueCard({
       <div
         id={`venue-card-${venue.id}`}
         className={`flex items-center gap-3 rounded-xl px-3 py-2.5 transition ${
-          selected ? "bg-white/15 ring-1 ring-orange-400/60" : "hover:bg-white/8"
+          selected ? "bg-white/15 ring-1 ring-white/50" : "hover:bg-white/8"
         }`}
       >
         <button
@@ -33,7 +33,7 @@ export function VenueCard({
           onClick={() => onSelect?.(venue)}
           className="flex min-w-0 flex-1 items-center gap-3 text-left"
         >
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-orange-600/80 to-[#5c4033] text-lg font-bold text-white/90">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-zinc-700 to-zinc-900 text-lg font-bold text-white/90">
             {venue.name.charAt(0)}
           </div>
           <div className="min-w-0 flex-1">
@@ -45,7 +45,7 @@ export function VenueCard({
               {distance ? ` · ${distance}` : ""}
             </p>
             <div className="mt-1 flex flex-wrap gap-1">
-              <span className="rounded bg-orange-500/30 px-1.5 py-0.5 text-[10px] text-orange-100">
+              <span className="rounded bg-white/20 px-1.5 py-0.5 text-[10px] text-white/90">
                 {TRUST_LABELS[venue.trustLevel] ?? venue.trustLevel}
               </span>
               {venue.tags.slice(0, 2).map((t) => (
@@ -76,8 +76,8 @@ export function VenueCard({
       id={`venue-card-${venue.id}`}
       className={`block rounded-lg border bg-white p-4 shadow-sm transition ${
         selected
-          ? "border-orange-500 ring-2 ring-orange-200"
-          : "border-zinc-200 hover:border-orange-400"
+          ? "border-zinc-900 ring-2 ring-zinc-200"
+          : "border-zinc-200 hover:border-zinc-400"
       }`}
     >
       <div className="flex items-start justify-between gap-2">
@@ -88,7 +88,7 @@ export function VenueCard({
       </div>
       <p className="mt-1 text-sm text-zinc-600">{venue.region}</p>
       <div className="mt-2 flex flex-wrap gap-1">
-        <span className="rounded bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-800">
+        <span className="rounded bg-zinc-900 px-2 py-0.5 text-xs font-medium text-white">
           {TRUST_LABELS[venue.trustLevel] ?? venue.trustLevel}
         </span>
         {venue.dropInAvailable && (

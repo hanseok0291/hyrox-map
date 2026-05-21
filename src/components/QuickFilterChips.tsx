@@ -71,7 +71,7 @@ export function QuickFilterChips({
           onClick={() => onChange(qf.apply(filters))}
           className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-medium transition ${
             qf.isActive(filters)
-              ? "bg-orange-500 text-white"
+              ? "bg-white text-zinc-900"
               : "bg-white/15 text-white/90 hover:bg-white/20"
           }`}
         >

@@ -18,8 +18,11 @@ export default async function VenueDetailPage({
   const links = parseLinks(venue.links);
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <Link href="/" className="text-sm text-orange-600 hover:underline">
+    <div className="mx-auto max-w-2xl bg-white px-4 py-8">
+      <Link
+        href="/"
+        className="text-sm font-medium text-zinc-900 hover:underline"
+      >
         ← 지도
       </Link>
       <h1 className="mt-4 text-2xl font-bold text-zinc-900">{v.name}</h1>
@@ -27,14 +30,16 @@ export default async function VenueDetailPage({
       <p className="text-sm text-zinc-500">{v.address}</p>
 
       <div className="mt-4 flex flex-wrap gap-2">
-        <span className="rounded bg-orange-100 px-2 py-1 text-sm font-medium text-orange-800">
+        <span className="rounded bg-zinc-900 px-2 py-1 text-sm font-medium text-white">
           {TRUST_LABELS[v.trustLevel]}
         </span>
         <span className="rounded bg-zinc-100 px-2 py-1 text-sm text-zinc-700">
           {VENUE_TYPE_LABELS[v.venueType]}
         </span>
         {v.dropInAvailable && (
-          <span className="rounded bg-zinc-100 px-2 py-1 text-sm">드랍인</span>
+          <span className="rounded bg-zinc-100 px-2 py-1 text-sm text-zinc-700">
+            드랍인
+          </span>
         )}
       </div>
 
@@ -51,19 +56,19 @@ export default async function VenueDetailPage({
 
       {v.outdoorRunNote && (
         <section className="mt-6">
-          <h2 className="text-sm font-medium text-zinc-700">야외 런</h2>
+          <h2 className="text-sm font-medium text-zinc-800">야외 런</h2>
           <p className="mt-1 text-sm text-zinc-600">{v.outdoorRunNote}</p>
         </section>
       )}
       {v.dropInInfo && (
         <section className="mt-4">
-          <h2 className="text-sm font-medium text-zinc-700">드랍인·시뮬</h2>
+          <h2 className="text-sm font-medium text-zinc-800">드랍인·시뮬</h2>
           <p className="mt-1 text-sm text-zinc-600">{v.dropInInfo}</p>
         </section>
       )}
       {v.priceNote && (
         <section className="mt-4">
-          <h2 className="text-sm font-medium text-zinc-700">가격 (참고)</h2>
+          <h2 className="text-sm font-medium text-zinc-800">가격 (참고)</h2>
           <p className="mt-1 text-sm text-zinc-600">{v.priceNote}</p>
         </section>
       )}
@@ -74,7 +79,7 @@ export default async function VenueDetailPage({
             href={links.website}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm hover:bg-zinc-50"
+            className="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm text-zinc-900 hover:bg-zinc-50"
           >
             홈페이지
           </a>
@@ -84,7 +89,7 @@ export default async function VenueDetailPage({
             href={links.reservation}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-lg bg-orange-500 px-4 py-2 text-sm text-white"
+            className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
           >
             예약
           </a>
@@ -93,15 +98,18 @@ export default async function VenueDetailPage({
           href={`https://map.kakao.com/link/map/${encodeURIComponent(v.name)},${v.lat},${v.lng}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded-lg border border-zinc-300 px-4 py-2 text-sm hover:bg-zinc-50"
+          className="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm text-zinc-900 hover:bg-zinc-50"
         >
           카카오맵
         </a>
       </div>
 
-      <p className="mt-8 text-xs text-zinc-400">
+      <p className="mt-8 text-xs text-zinc-500">
         정보가 다르면{" "}
-        <Link href="/report" className="text-orange-600 underline">
+        <Link
+          href="/report"
+          className="font-medium text-zinc-900 underline hover:text-zinc-700"
+        >
           수정 제보
         </Link>
         해 주세요.

@@ -46,7 +46,7 @@ export function FilterSheet({
             placeholder="시설명·지역 검색"
             value={filters.q}
             onChange={(e) => onChange({ ...filters, q: e.target.value })}
-            className="w-full rounded-xl border border-white/10 bg-black/25 py-2.5 pl-9 pr-3 text-sm text-white placeholder:text-white/40 focus:border-orange-400/50 focus:outline-none"
+            className="w-full rounded-xl border border-white/10 bg-black/25 py-2.5 pl-9 pr-3 text-sm text-white placeholder:text-white/40 focus:border-white/40 focus:outline-none"
           />
         </div>
 
@@ -79,7 +79,7 @@ export function FilterSheet({
                   onClick={() => toggleTag(tag)}
                   className={`rounded-full px-2.5 py-1 text-[11px] ${
                     filters.tags.includes(tag)
-                      ? "bg-orange-500/90 text-white"
+                      ? "bg-white text-zinc-900"
                       : "bg-white/10 text-white/75"
                   }`}
                 >
@@ -125,7 +125,7 @@ export function FilterSheet({
             onClick={() => toggleTag(tag)}
             className={`rounded-full px-3 py-1 text-xs ${
               filters.tags.includes(tag)
-                ? "bg-orange-500 text-white"
+                ? "bg-zinc-900 text-white"
                 : "bg-zinc-100 text-zinc-700"
             }`}
           >

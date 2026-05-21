@@ -55,7 +55,7 @@ export default function AdminReportDetailPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
-      <Link href="/admin/reports" className="text-sm text-orange-600">
+      <Link href="/admin/reports" className="text-sm text-zinc-900">
         ← 큐
       </Link>
       <h1 className="mt-4 text-xl font-bold">{report.name}</h1>
@@ -76,7 +76,7 @@ export default function AdminReportDetailPage() {
 
       <section className="mt-4">
         <h2 className="text-sm font-medium">증빙</h2>
-        <ul className="mt-2 list-inside list-disc text-sm text-orange-600">
+        <ul className="mt-2 list-inside list-disc text-sm text-zinc-900">
           {report.evidenceUrls.map((url) => (
             <li key={url}>
               <a href={url} target="_blank" rel="noopener noreferrer">

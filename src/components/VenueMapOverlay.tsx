@@ -37,9 +37,9 @@ export function VenueMapOverlay({
 
       <div className="mt-2 flex flex-wrap items-center gap-1">
         {distance && (
-          <span className="text-sm font-medium text-orange-600">{distance}</span>
+          <span className="text-sm font-medium text-zinc-900">{distance}</span>
         )}
-        <span className="rounded bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-800">
+        <span className="rounded bg-zinc-900 px-2 py-0.5 text-xs font-medium text-white">
           {TRUST_LABELS[venue.trustLevel] ?? venue.trustLevel}
         </span>
         {venue.dropInAvailable && (
@@ -70,7 +70,7 @@ export function VenueMapOverlay({
 
       <Link
         href={`/venues/${venue.slug}`}
-        className="mt-3 block w-full rounded-lg bg-orange-500 py-2.5 text-center text-sm font-medium text-white hover:bg-orange-600"
+        className="mt-3 block w-full rounded-lg bg-zinc-900 py-2.5 text-center text-sm font-medium text-white hover:bg-zinc-800"
       >
         상세 보기
       </Link>

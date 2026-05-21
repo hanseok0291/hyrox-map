@@ -12,9 +12,9 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <>
+    <div className="page-light min-h-dvh">
       <SiteHeader />
       <main>{children}</main>
-    </>
+    </div>
   );
 }

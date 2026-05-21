@@ -76,7 +76,7 @@ export function MapSidebar({
             <button
               type="button"
               onClick={onMyLocation}
-              className="text-xs text-orange-300 hover:text-orange-200"
+              className="text-xs text-white/80 hover:text-white"
             >
               내 위치
             </button>
@@ -94,7 +94,7 @@ export function MapSidebar({
         <div className="shrink-0 border-t border-white/10 p-4">
           <Link
             href="/report"
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 py-3.5 text-sm font-semibold text-white shadow-lg hover:bg-orange-400"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-zinc-900 py-3.5 text-sm font-semibold text-white shadow-lg hover:bg-zinc-800"
           >
             <span className="text-lg leading-none">+</span>
             시설 제보하기

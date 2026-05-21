@@ -37,7 +37,7 @@ export function MapMobileChrome({
               onChange={(e) =>
                 onFiltersChange({ ...filters, q: e.target.value })
               }
-              className="w-full rounded-full border-0 bg-white/10 py-2.5 pl-9 pr-3 text-sm text-white placeholder:text-white/45 focus:bg-white/15 focus:outline-none focus:ring-1 focus:ring-orange-400/50"
+              className="w-full rounded-full border-0 bg-white/10 py-2.5 pl-9 pr-3 text-sm text-white placeholder:text-white/45 focus:bg-white/15 focus:outline-none focus:ring-1 focus:ring-white/30"
             />
           </div>
         </div>
@@ -84,13 +84,13 @@ export function MapMobileChrome({
             </span>
             목록
             {!loading && (
-              <span className="text-[10px] text-orange-300">{venueCount}</span>
+              <span className="text-[10px] text-white/70">{venueCount}</span>
             )}
           </button>
 
           <Link
             href="/report"
-            className="flex flex-[1.4] items-center justify-center gap-1 rounded-full bg-orange-500 px-4 py-3 text-sm font-bold text-white shadow-md hover:bg-orange-400"
+            className="flex flex-[1.4] items-center justify-center gap-1 rounded-full bg-zinc-900 px-4 py-3 text-sm font-bold text-white shadow-md hover:bg-zinc-800"
           >
             <span className="text-lg leading-none">+</span>
             제보
