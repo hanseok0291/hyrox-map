@@ -1,10 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { FilterSheet, type VenueFilters } from "@/components/FilterSheet";
+import type { VenueFilters } from "@/components/FilterSheet";
+import { MapSidebar } from "@/components/MapSidebar";
 import { MapView } from "@/components/MapView";
 import { VenueMapOverlay } from "@/components/VenueMapOverlay";
-import { VenueList } from "@/components/VenueList";
 import type { VenueDTO } from "@/lib/types";
 
 const DEFAULT_CENTER = { lat: 37.5665, lng: 126.978 };
@@ -14,6 +14,7 @@ export default function HomePage() {
   const [venues, setVenues] = useState<VenueDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedVenue, setSelectedVenue] = useState<VenueDTO | null>(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [filters, setFilters] = useState<VenueFilters>({
     q: "",
     venueType: "",
@@ -52,53 +53,49 @@ export default function HomePage() {
     fetchVenues();
   }, [fetchVenues]);
 
+  const handleMyLocation = () => {
+    navigator.geolocation?.getCurrentPosition((p) =>
+      setCenter({
+        lat: p.coords.latitude,
+        lng: p.coords.longitude,
+      })
+    );
+  };
+
   return (
-    <div className="mx-auto flex max-w-6xl flex-col lg:h-[calc(100vh-4rem)] lg:flex-row">
-      <div className="lg:w-[58%]">
-        <FilterSheet filters={filters} onChange={setFilters} />
-        <div className="relative h-[40vh] lg:h-[calc(100%-12rem)]">
-          <MapView
-            venues={venues}
-            center={center}
-            selectedId={selectedVenue?.id ?? null}
-            onSelect={setSelectedVenue}
-          />
-          {selectedVenue && (
-            <VenueMapOverlay
-              venue={selectedVenue}
-              onClose={() => setSelectedVenue(null)}
-            />
-          )}
-        </div>
-        <div className="border-t border-zinc-200 bg-white px-4 py-2 lg:hidden">
-          <button
-            type="button"
-            onClick={() => {
-              navigator.geolocation?.getCurrentPosition((p) =>
-                setCenter({
-                  lat: p.coords.latitude,
-                  lng: p.coords.longitude,
-                })
-              );
-            }}
-            className="text-sm text-orange-600"
-          >
-            내 위치로
-          </button>
-        </div>
+    <div className="relative h-dvh w-full">
+      {/* Full-screen map */}
+      <div className="absolute inset-0">
+        <MapView
+          venues={venues}
+          center={center}
+          selectedId={selectedVenue?.id ?? null}
+          onSelect={setSelectedVenue}
+        />
       </div>
-      <aside className="border-t border-zinc-200 lg:w-[42%] lg:border-l lg:border-t-0">
-        <h2 className="border-b border-zinc-100 px-4 py-2 text-sm font-medium text-zinc-700">
-          근처 시설 {loading ? "…" : `(${venues.length})`}
-        </h2>
-        <div className="max-h-[50vh] overflow-y-auto lg:max-h-none lg:flex-1">
-          <VenueList
-            venues={venues}
-            loading={loading}
-            selectedId={selectedVenue?.id ?? null}
+
+      {/* Floating sidebar (PC) / top panel area (mobile uses full width sidebar overlay) */}
+      <MapSidebar
+        filters={filters}
+        onFiltersChange={setFilters}
+        venues={venues}
+        loading={loading}
+        selectedId={selectedVenue?.id ?? null}
+        onVenueSelect={setSelectedVenue}
+        onMyLocation={handleMyLocation}
+        collapsed={sidebarCollapsed}
+        onCollapsedChange={setSidebarCollapsed}
+      />
+
+      {/* Mobile-only bottom card when marker selected */}
+      {selectedVenue && (
+        <div className="lg:hidden">
+          <VenueMapOverlay
+            venue={selectedVenue}
+            onClose={() => setSelectedVenue(null)}
           />
         </div>
-      </aside>
+      )}
     </div>
   );
 }

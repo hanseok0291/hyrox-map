@@ -2,13 +2,74 @@ import Link from "next/link";
 import type { VenueDTO } from "@/lib/types";
 import { TAG_LABELS, TRUST_LABELS } from "@/lib/types";
 
+function formatDistance(km: number | undefined) {
+  if (km == null) return null;
+  return km < 1 ? `${Math.round(km * 1000)}m` : `${km.toFixed(1)}km`;
+}
+
 export function VenueCard({
   venue,
   selected,
+  variant = "default",
+  onSelect,
 }: {
   venue: VenueDTO;
   selected?: boolean;
+  variant?: "default" | "sidebar";
+  onSelect?: (venue: VenueDTO) => void;
 }) {
+  const distance = formatDistance(venue.distanceKm);
+
+  if (variant === "sidebar") {
+    return (
+      <div
+        id={`venue-card-${venue.id}`}
+        className={`flex items-center gap-3 rounded-xl px-3 py-2.5 transition ${
+          selected ? "bg-white/15 ring-1 ring-orange-400/60" : "hover:bg-white/8"
+        }`}
+      >
+        <button
+          type="button"
+          onClick={() => onSelect?.(venue)}
+          className="flex min-w-0 flex-1 items-center gap-3 text-left"
+        >
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-orange-600/80 to-[#5c4033] text-lg font-bold text-white/90">
+            {venue.name.charAt(0)}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold text-white">
+              {venue.name}
+            </p>
+            <p className="mt-0.5 truncate text-xs text-white/55">
+              {venue.region}
+              {distance ? ` · ${distance}` : ""}
+            </p>
+            <div className="mt-1 flex flex-wrap gap-1">
+              <span className="rounded bg-orange-500/30 px-1.5 py-0.5 text-[10px] text-orange-100">
+                {TRUST_LABELS[venue.trustLevel] ?? venue.trustLevel}
+              </span>
+              {venue.tags.slice(0, 2).map((t) => (
+                <span
+                  key={t}
+                  className="rounded bg-white/10 px-1.5 py-0.5 text-[10px] text-white/70"
+                >
+                  {TAG_LABELS[t] ?? t}
+                </span>
+              ))}
+            </div>
+          </div>
+        </button>
+        <Link
+          href={`/venues/${venue.slug}`}
+          className="shrink-0 rounded-lg p-2 text-white/50 hover:bg-white/10 hover:text-white"
+          aria-label="상세 보기"
+        >
+          ›
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <Link
       href={`/venues/${venue.slug}`}
@@ -21,12 +82,8 @@ export function VenueCard({
     >
       <div className="flex items-start justify-between gap-2">
         <h3 className="font-semibold text-zinc-900">{venue.name}</h3>
-        {venue.distanceKm != null && (
-          <span className="shrink-0 text-sm text-zinc-500">
-            {venue.distanceKm < 1
-              ? `${Math.round(venue.distanceKm * 1000)}m`
-              : `${venue.distanceKm.toFixed(1)}km`}
-          </span>
+        {distance && (
+          <span className="shrink-0 text-sm text-zinc-500">{distance}</span>
         )}
       </div>
       <p className="mt-1 text-sm text-zinc-600">{venue.region}</p>

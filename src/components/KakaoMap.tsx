@@ -149,7 +149,7 @@ export function KakaoMap({
   }, [selectedId, venues, ready]);
 
   return (
-    <div className="relative h-full min-h-[280px] w-full">
+    <div className="relative h-full min-h-0 w-full">
       <div ref={containerRef} className="h-full w-full" />
       {error && (
         <div className="absolute inset-0 flex items-center justify-center bg-zinc-100/90 p-4 text-center text-sm text-red-700">

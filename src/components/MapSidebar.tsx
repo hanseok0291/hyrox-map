@@ -1,0 +1,106 @@
+"use client";
+
+import Link from "next/link";
+import { FilterSheet, type VenueFilters } from "@/components/FilterSheet";
+import { VenueList } from "@/components/VenueList";
+import type { VenueDTO } from "@/lib/types";
+
+export function MapSidebar({
+  filters,
+  onFiltersChange,
+  venues,
+  loading,
+  selectedId,
+  onVenueSelect,
+  onMyLocation,
+  collapsed,
+  onCollapsedChange,
+}: {
+  filters: VenueFilters;
+  onFiltersChange: (f: VenueFilters) => void;
+  venues: VenueDTO[];
+  loading: boolean;
+  selectedId: string | null;
+  onVenueSelect: (venue: VenueDTO) => void;
+  onMyLocation: () => void;
+  collapsed: boolean;
+  onCollapsedChange: (v: boolean) => void;
+}) {
+  if (collapsed) {
+    return (
+      <button
+        type="button"
+        onClick={() => onCollapsedChange(false)}
+        className="absolute bottom-[min(58dvh,520px)] left-4 z-30 flex h-11 w-11 lg:bottom-auto lg:top-4 items-center justify-center rounded-full bg-[#3d2c24]/95 text-white shadow-lg backdrop-blur-sm hover:bg-[#4a362c]"
+        aria-label="패널 열기"
+      >
+        →
+      </button>
+    );
+  }
+
+  return (
+    <aside className="pointer-events-none absolute inset-x-0 bottom-0 z-30 flex max-h-[min(58dvh,520px)] flex-col lg:inset-x-auto lg:inset-y-0 lg:left-0 lg:max-h-none lg:max-w-[400px] lg:p-5">
+      <div className="pointer-events-auto flex h-full max-h-full flex-col overflow-hidden rounded-t-2xl bg-[#3d2c24]/95 text-white shadow-2xl backdrop-blur-md lg:rounded-2xl lg:max-h-[calc(100dvh-2.5rem)]">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-2 border-b border-white/10 px-4 pb-3 pt-4">
+          <div>
+            <Link href="/" className="text-xl font-bold tracking-tight">
+              하이록스 맵
+            </Link>
+            <p className="mt-0.5 text-[11px] text-white/55">
+              비공식 커뮤니티 · HYROX와 무관
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => onCollapsedChange(true)}
+            className="hidden shrink-0 rounded-lg px-2 py-1 text-sm text-white/70 hover:bg-white/10 lg:inline"
+            aria-label="패널 접기"
+          >
+            ≪
+          </button>
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <FilterSheet
+            variant="sidebar"
+            filters={filters}
+            onChange={onFiltersChange}
+          />
+
+          <div className="flex items-center justify-between px-4 py-2">
+            <span className="text-xs font-medium text-white/70">
+              근처 시설 {loading ? "…" : `(${venues.length})`}
+            </span>
+            <button
+              type="button"
+              onClick={onMyLocation}
+              className="text-xs text-orange-300 hover:text-orange-200"
+            >
+              내 위치
+            </button>
+          </div>
+
+          <VenueList
+            variant="sidebar"
+            venues={venues}
+            loading={loading}
+            selectedId={selectedId}
+            onVenueSelect={onVenueSelect}
+          />
+        </div>
+
+        <div className="shrink-0 border-t border-white/10 p-4">
+          <Link
+            href="/report"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 py-3.5 text-sm font-semibold text-white shadow-lg hover:bg-orange-400"
+          >
+            <span className="text-lg leading-none">+</span>
+            시설 제보하기
+          </Link>
+        </div>
+      </div>
+    </aside>
+  );
+}

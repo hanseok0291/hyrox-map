@@ -18,7 +18,7 @@ export function MapPlaceholder({
   const hasKey = Boolean(process.env.NEXT_PUBLIC_KAKAO_MAP_KEY);
 
   return (
-    <div className="relative h-full min-h-[280px] w-full bg-zinc-100">
+    <div className="relative h-full min-h-0 w-full bg-zinc-100">
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-4 text-center">
         {!hasKey ? (
           <>
