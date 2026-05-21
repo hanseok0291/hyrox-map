@@ -30,10 +30,13 @@
   "venue_type": "crossfit_box",
   "trust_level": "official",
   "source": "official",
-  "tags": ["sled_push_pull", "rower"],
+  "tags": ["sled_push", "sled_pull", "rower"],
   "outdoor_run_note": "1km 코스 왕복 2.5회 (예시)",
   "drop_in_info": "토요일 시뮬 클래스, 드랍인 가능",
-  "price_note": "비회원 3만원 (예시, 확인 필요)",
+  "sim_price_single": "3만원 (시뮬 드랍인, 확인 필요)",
+  "sim_price_double": null,
+  "sim_price_relay": null,
+  "price_note": "월 회원권 15만원대 (기타 참고)",
   "drop_in_available": true,
   "links": {
     "website": "",
@@ -51,7 +54,7 @@
 
 ### `tags` 값
 
-`outdoor_run`, `indoor_run`, `sled_push_pull`, `ski_erg`, `rower`, `wall_ball`, `farmers_carry`, `burpee_broad_jump`, `full_stations`
+`outdoor_run`, `indoor_run`, `sled_push`, `sled_pull`, `ski_erg`, `rower`, `wall_ball`, `farmers_carry`, `burpee_broad_jump`, `sandbag_lunge`, `full_stations` (레거시: `sled_push_pull` 표시만 지원)
 
 ---
 
@@ -94,7 +97,8 @@ npm run db:seed
 ## 6. 품질 기준 (시드에도 적용)
 
 - [ ] `full_stations`는 6개 이상 태그 + 코스 메모 있을 때만
-- [ ] 가격·드랍인은 **확인된 경우만** — 불확실 시 `price_note` 비움
+- [ ] 드랍인 시뮬 비용은 **싱글·더블·릴레이** (`sim_price_*`) — 확인된 항목만, 모르면 `null`
+- [ ] 회원권·일일권 등은 `price_note` (기타 참고)
 - [ ] 호텔 피트니스는 `venue_type: gym`, 공식 클럽과 혼동 방지
 
 ---

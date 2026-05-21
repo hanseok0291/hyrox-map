@@ -1,15 +1,30 @@
 @import "tailwindcss";
 
+/**
+ * HYROX 공식 사이트 브랜드 컬러
+ * @see https://hyroxsouthkorea.com/ko/ (헤더 hover·CTA: #ffed00, 배경: #000 / #262626)
+ */
 :root {
+  --hyrox-yellow: #ffed00;
+  --hyrox-yellow-hover: #e6d500;
+  --hyrox-black: #000000;
+  --hyrox-panel: #262626;
   --background: #ffffff;
   --foreground: #171717;
-  --accent: #171717;
-  --accent-hover: #3f3f46;
+  --accent: var(--hyrox-yellow);
+  --accent-hover: var(--hyrox-yellow-hover);
+  --accent-foreground: var(--hyrox-black);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-hyrox-yellow: #ffed00;
+  --color-hyrox-yellow-hover: #e6d500;
+  --color-hyrox-black: #000000;
+  --color-hyrox-panel: #262626;
+  --color-accent: var(--color-hyrox-yellow);
+  --color-accent-foreground: var(--color-hyrox-black);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -25,9 +40,20 @@ body {
   height: 100%;
 }
 
+/* 전체 화면 카카오맵: 레이어 합성 부담 줄이기 */
+.kakao-map-host {
+  contain: layout paint style;
+  isolation: isolate;
+}
+
 /* Sub-pages (detail, report, admin): always light */
 .page-light {
   background: #ffffff;
   color: #171717;
   min-height: 100%;
+}
+
+/* 지도 위 플로팅 패널 (목록·상세) */
+.map-panel-surface {
+  background-color: var(--hyrox-panel);
 }

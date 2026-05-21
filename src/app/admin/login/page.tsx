@@ -35,7 +35,7 @@ export default function AdminLoginPage() {
         {error && <p className="text-sm text-red-600">{error}</p>}
         <button
           type="submit"
-          className="w-full rounded-lg bg-zinc-900 py-2 text-white"
+          className="w-full rounded-lg bg-hyrox-yellow py-2 font-bold text-hyrox-black hover:bg-hyrox-yellow-hover"
         >
           로그인
         </button>

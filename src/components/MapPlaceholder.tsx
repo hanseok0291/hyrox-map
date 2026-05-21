@@ -42,7 +42,7 @@ export function MapPlaceholder({
             key={v.id}
             type="button"
             onClick={() => onSelect?.(v)}
-            className="shrink-0 rounded-full bg-zinc-900 px-2 py-1 text-xs text-white shadow"
+            className="shrink-0 rounded-full bg-hyrox-yellow px-2 py-1 text-xs font-medium text-hyrox-black shadow"
             title={v.name}
           >
             {v.name.slice(0, 8)}

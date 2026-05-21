@@ -31,7 +31,7 @@ export function VenueList({
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className={`animate-pulse rounded-xl ${
+            className={`rounded-xl ${
               isSidebar ? "h-16 bg-white/10" : "h-24 bg-zinc-100"
             }`}
           />

@@ -21,7 +21,11 @@ model Venue {
   tags             String
   outdoorRunNote   String?   @map("outdoor_run_note")
   dropInInfo       String?   @map("drop_in_info")
+  simScheduleNote  String?   @map("sim_schedule_note")
   priceNote        String?   @map("price_note")
+  simPriceSingle   String?   @map("sim_price_single")
+  simPriceDouble   String?   @map("sim_price_double")
+  simPriceRelay    String?   @map("sim_price_relay")
   dropInAvailable  Boolean   @default(false) @map("drop_in_available")
   links            String
   officialClubId   String?   @map("official_club_id")
@@ -40,6 +44,9 @@ model Venue {
 
 model Report {
   id                 String    @id @default(cuid())
+  reportKind         String    @default("new") @map("report_kind")
+  targetVenueSlug    String?   @map("target_venue_slug")
+  reportTopics       String?   @map("report_topics")
   name               String
   address            String
   region             String?
@@ -50,10 +57,16 @@ model Report {
   tags               String
   evidenceUrls       String    @map("evidence_urls")
   dropInInfo         String?   @map("drop_in_info")
+  simScheduleNote    String?   @map("sim_schedule_note")
+  outdoorRunNote     String?   @map("outdoor_run_note")
   priceNote          String?   @map("price_note")
+  simPriceSingle     String?   @map("sim_price_single")
+  simPriceDouble     String?   @map("sim_price_double")
+  simPriceRelay      String?   @map("sim_price_relay")
   reporterContact    String?   @map("reporter_contact")
   website            String?
   instagram          String?
+  naverReservation   String?   @map("naver_reservation")
   status             String    @default("submitted")
   moderatorNote      String?   @map("moderator_note")
   reporterMessage    String?   @map("reporter_message")

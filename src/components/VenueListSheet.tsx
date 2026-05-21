@@ -46,7 +46,7 @@ export function VenueListSheet({
         aria-label="닫기"
         onClick={onClose}
       />
-      <div className="absolute inset-x-0 bottom-0 flex max-h-[min(85dvh,720px)] flex-col rounded-t-2xl bg-[#3d2c24] text-white shadow-2xl">
+      <div className="map-panel-surface absolute inset-x-0 bottom-0 flex max-h-[min(85dvh,720px)] flex-col rounded-t-2xl text-white shadow-2xl">
         <div className="flex shrink-0 justify-center py-3">
           <div className="h-1 w-10 rounded-full bg-white/25" />
         </div>

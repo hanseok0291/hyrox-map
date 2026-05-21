@@ -13,29 +13,11 @@ export const TRUST_LEVELS = [
   "pending",
 ] as const;
 
-export const SIMULATION_TAGS = [
-  "outdoor_run",
-  "indoor_run",
-  "sled_push_pull",
-  "ski_erg",
-  "rower",
-  "wall_ball",
-  "farmers_carry",
-  "burpee_broad_jump",
-  "full_stations",
-] as const;
-
-export const TAG_LABELS: Record<string, string> = {
-  outdoor_run: "야외 런",
-  indoor_run: "실내 런",
-  sled_push_pull: "슬래드",
-  ski_erg: "스키에르고",
-  rower: "로잉",
-  wall_ball: "월볼",
-  farmers_carry: "파머스 캐리",
-  burpee_broad_jump: "BBJ",
-  full_stations: "풀 스테이션",
-};
+export {
+  SIMULATION_TAGS,
+  TAG_LABELS,
+  type SimulationTag,
+} from "@/lib/simulation-tags";
 
 export const VENUE_TYPE_LABELS: Record<string, string> = {
   official_club: "공식 클럽",
@@ -72,7 +54,11 @@ export type SeedVenue = {
   tags: string[];
   outdoor_run_note?: string | null;
   drop_in_info?: string | null;
+  sim_schedule_note?: string | null;
   price_note?: string | null;
+  sim_price_single?: string | null;
+  sim_price_double?: string | null;
+  sim_price_relay?: string | null;
   drop_in_available?: boolean;
   links?: VenueLinks;
   official_club_id?: string | null;
@@ -92,7 +78,11 @@ export type VenueDTO = {
   tags: string[];
   outdoorRunNote: string | null;
   dropInInfo: string | null;
+  simScheduleNote: string | null;
   priceNote: string | null;
+  simPriceSingle: string | null;
+  simPriceDouble: string | null;
+  simPriceRelay: string | null;
   dropInAvailable: boolean;
   links: VenueLinks;
   distanceKm?: number;

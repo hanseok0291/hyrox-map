@@ -22,33 +22,61 @@ export async function POST(request: NextRequest) {
   }
 
   const data = parsed.data;
+  const tagsJson = JSON.stringify(data.tags ?? []);
 
-  const published = await prisma.venue.findMany({
-    where: { publishedAt: { not: null } },
-    select: { lat: true, lng: true, name: true },
-  });
+  if (data.reportKind === "update" && data.targetVenueSlug) {
+    const exists = await prisma.venue.findUnique({
+      where: { slug: data.targetVenueSlug },
+    });
+    if (!exists) {
+      return NextResponse.json(
+        { error: "대상 시설을 찾을 수 없습니다." },
+        { status: 404 }
+      );
+    }
+  }
 
-  const duplicate = published.some(
-    (v) => haversineKm(v.lat, v.lng, data.lat, data.lng) < DUPLICATE_RADIUS_KM
-  );
+  let duplicateNote: string | null = null;
+  if (data.reportKind === "new") {
+    const published = await prisma.venue.findMany({
+      where: { publishedAt: { not: null } },
+      select: { lat: true, lng: true },
+    });
+    const duplicate = published.some(
+      (v) => haversineKm(v.lat, v.lng, data.lat, data.lng) < DUPLICATE_RADIUS_KM
+    );
+    if (duplicate) duplicateNote = "AUTO: possible duplicate within 50m";
+  }
 
   const report = await prisma.report.create({
     data: {
+      reportKind: data.reportKind,
+      targetVenueSlug: data.targetVenueSlug ?? null,
+      reportTopics: data.reportTopics?.length
+        ? JSON.stringify(data.reportTopics)
+        : null,
       name: data.name,
       address: data.address,
+      region: data.address.split(" ").slice(0, 2).join(" ") || null,
       lat: data.lat,
       lng: data.lng,
       venueType: data.venueType,
       experienceNote: data.experienceNote,
-      tags: JSON.stringify(data.tags),
+      tags: tagsJson,
       evidenceUrls: JSON.stringify(data.evidenceUrls),
       dropInInfo: data.dropInInfo ?? null,
+      simScheduleNote: data.simScheduleNote ?? null,
+      outdoorRunNote: data.outdoorRunNote ?? null,
       priceNote: data.priceNote ?? null,
+      simPriceSingle: data.simPriceSingle ?? null,
+      simPriceDouble: data.simPriceDouble ?? null,
+      simPriceRelay: data.simPriceRelay ?? null,
       reporterContact: data.reporterContact ?? null,
       website: data.website || null,
       instagram: data.instagram ?? null,
-      status: duplicate ? "submitted" : "submitted",
-      moderatorNote: duplicate ? "AUTO: possible duplicate within 50m" : null,
+      naverReservation: data.naverReservation ?? null,
+      status: "submitted",
+      moderatorNote: duplicateNote,
     },
   });
 

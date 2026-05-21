@@ -1,6 +1,7 @@
 "use client";
 
 import type { VenueFilters } from "@/components/FilterSheet";
+import { isSledTag, venueHasAnySled } from "@/lib/simulation-tags";
 
 export const QUICK_FILTERS: {
   id: string;
@@ -34,14 +35,14 @@ export const QUICK_FILTERS: {
   },
   {
     id: "sled",
-    label: "슬래드",
-    apply: (f) => ({
-      ...f,
-      tags: f.tags.includes("sled_push_pull")
-        ? f.tags
-        : [...f.tags, "sled_push_pull"],
-    }),
-    isActive: (f) => f.tags.includes("sled_push_pull"),
+    label: "슬레드",
+    apply: (f) => {
+      if (venueHasAnySled(f.tags)) {
+        return { ...f, tags: f.tags.filter((t) => !isSledTag(t)) };
+      }
+      return { ...f, tags: [...f.tags, "sled_push"] };
+    },
+    isActive: (f) => venueHasAnySled(f.tags),
   },
   {
     id: "official",
@@ -71,7 +72,7 @@ export function QuickFilterChips({
           onClick={() => onChange(qf.apply(filters))}
           className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-medium transition ${
             qf.isActive(filters)
-              ? "bg-white text-zinc-900"
+              ? "bg-hyrox-yellow text-hyrox-black"
               : "bg-white/15 text-white/90 hover:bg-white/20"
           }`}
         >

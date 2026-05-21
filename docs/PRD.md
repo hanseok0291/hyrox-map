@@ -78,7 +78,7 @@
 
 ### 5.3 시뮬레이션 환경 태그
 
-`outdoor_run`, `indoor_run`, `sled_push_pull`, `ski_erg`, `rower`, `wall_ball`, `farmers_carry`, `burpee_broad_jump`, `full_stations`
+`outdoor_run`, `indoor_run`, `sled_push`, `sled_pull`, `ski_erg`, `rower`, `wall_ball`, `farmers_carry`, `burpee_broad_jump`, `sandbag_lunge`, `full_stations`
 
 ### 5.4 신뢰도 (`trust_level`)
 

@@ -54,7 +54,11 @@ export function toVenueDTO(
     tags: parseTags(venue.tags),
     outdoorRunNote: venue.outdoorRunNote,
     dropInInfo: venue.dropInInfo,
+    simScheduleNote: venue.simScheduleNote,
     priceNote: venue.priceNote,
+    simPriceSingle: venue.simPriceSingle,
+    simPriceDouble: venue.simPriceDouble,
+    simPriceRelay: venue.simPriceRelay,
     dropInAvailable: venue.dropInAvailable,
     links: parseLinks(venue.links),
   };

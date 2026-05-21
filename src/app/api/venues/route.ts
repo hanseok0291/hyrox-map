@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { listPublishedVenues, venuesToDtos } from "@/lib/venues-store";
+import { venueMatchesAllFilterTags } from "@/lib/simulation-tags";
 import { parseTags } from "@/lib/venue";
 
 export async function GET(request: NextRequest) {
@@ -33,7 +34,7 @@ export async function GET(request: NextRequest) {
   if (tags?.length) {
     venues = venues.filter((v) => {
       const vt = parseTags(v.tags);
-      return tags.every((t) => vt.includes(t));
+      return venueMatchesAllFilterTags(vt, tags);
     });
   }
 

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { hasAnySimPrice, simPricesFromFields } from "@/lib/sim-prices";
 import type { VenueDTO } from "@/lib/types";
 import { TAG_LABELS, TRUST_LABELS } from "@/lib/types";
 
@@ -19,6 +20,12 @@ export function VenueCard({
   onSelect?: (venue: VenueDTO) => void;
 }) {
   const distance = formatDistance(venue.distanceKm);
+  const simPrices = simPricesFromFields(venue);
+  const priceHint =
+    simPrices.single ??
+    simPrices.double ??
+    simPrices.relay ??
+    null;
 
   if (variant === "sidebar") {
     return (
@@ -43,9 +50,12 @@ export function VenueCard({
             <p className="mt-0.5 truncate text-xs text-white/55">
               {venue.region}
               {distance ? ` · ${distance}` : ""}
+              {hasAnySimPrice(simPrices) && priceHint
+                ? ` · 시뮬 ${priceHint}`
+                : ""}
             </p>
             <div className="mt-1 flex flex-wrap gap-1">
-              <span className="rounded bg-white/20 px-1.5 py-0.5 text-[10px] text-white/90">
+              <span className="rounded bg-hyrox-yellow px-1.5 py-0.5 text-[10px] font-medium text-hyrox-black">
                 {TRUST_LABELS[venue.trustLevel] ?? venue.trustLevel}
               </span>
               {venue.tags.slice(0, 2).map((t) => (
@@ -59,13 +69,14 @@ export function VenueCard({
             </div>
           </div>
         </button>
-        <Link
-          href={`/venues/${venue.slug}`}
+        <button
+          type="button"
+          onClick={() => onSelect?.(venue)}
           className="shrink-0 rounded-lg p-2 text-white/50 hover:bg-white/10 hover:text-white"
-          aria-label="상세 보기"
+          aria-label="상세 패널"
         >
           ›
-        </Link>
+        </button>
       </div>
     );
   }
@@ -76,7 +87,7 @@ export function VenueCard({
       id={`venue-card-${venue.id}`}
       className={`block rounded-lg border bg-white p-4 shadow-sm transition ${
         selected
-          ? "border-zinc-900 ring-2 ring-zinc-200"
+          ? "border-hyrox-yellow ring-2 ring-hyrox-yellow/40"
           : "border-zinc-200 hover:border-zinc-400"
       }`}
     >
@@ -88,7 +99,7 @@ export function VenueCard({
       </div>
       <p className="mt-1 text-sm text-zinc-600">{venue.region}</p>
       <div className="mt-2 flex flex-wrap gap-1">
-        <span className="rounded bg-zinc-900 px-2 py-0.5 text-xs font-medium text-white">
+        <span className="rounded bg-hyrox-yellow px-2 py-0.5 text-xs font-medium text-hyrox-black">
           {TRUST_LABELS[venue.trustLevel] ?? venue.trustLevel}
         </span>
         {venue.dropInAvailable && (

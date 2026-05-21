@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { SimPriceCards } from "@/components/SimPriceCards";
 import { TAG_LABELS } from "@/lib/types";
 
 type ReportDetail = {
@@ -13,6 +14,17 @@ type ReportDetail = {
   status: string;
   tags: string[];
   evidenceUrls: string[];
+  reportKind: string;
+  targetVenueSlug: string | null;
+  dropInInfo: string | null;
+  simScheduleNote: string | null;
+  outdoorRunNote: string | null;
+  priceNote: string | null;
+  simPriceSingle: string | null;
+  simPriceDouble: string | null;
+  simPriceRelay: string | null;
+  instagram: string | null;
+  naverReservation: string | null;
   moderatorNote: string | null;
 };
 
@@ -60,7 +72,12 @@ export default function AdminReportDetailPage() {
       </Link>
       <h1 className="mt-4 text-xl font-bold">{report.name}</h1>
       <p className="text-sm text-zinc-600">{report.address}</p>
-      <p className="mt-2 text-xs text-zinc-500">상태: {report.status}</p>
+      <p className="mt-2 text-xs text-zinc-500">
+        상태: {report.status}
+        {report.reportKind === "update" && report.targetVenueSlug && (
+          <> · 수정 제보 → {report.targetVenueSlug}</>
+        )}
+      </p>
 
       <section className="mt-6 rounded-lg border border-zinc-200 p-4">
         <h2 className="text-sm font-medium">체험 내용</h2>
@@ -73,6 +90,38 @@ export default function AdminReportDetailPage() {
           ))}
         </div>
       </section>
+
+      {(report.dropInInfo ||
+        report.simPriceSingle ||
+        report.simPriceDouble ||
+        report.simPriceRelay ||
+        report.priceNote) && (
+        <section className="mt-4">
+          {report.dropInInfo && (
+            <p className="text-sm text-zinc-600">
+              <span className="font-medium text-zinc-800">드랍인·시뮬:</span>{" "}
+              {report.dropInInfo}
+            </p>
+          )}
+          <div className="mt-3">
+            <SimPriceCards
+              prices={{
+                simPriceSingle: report.simPriceSingle,
+                simPriceDouble: report.simPriceDouble,
+                simPriceRelay: report.simPriceRelay,
+              }}
+              variant="light"
+              showReportCta={false}
+            />
+          </div>
+          {report.priceNote && (
+            <p className="mt-2 text-sm text-zinc-600">
+              <span className="font-medium text-zinc-800">기타:</span>{" "}
+              {report.priceNote}
+            </p>
+          )}
+        </section>
+      )}
 
       <section className="mt-4">
         <h2 className="text-sm font-medium">증빙</h2>

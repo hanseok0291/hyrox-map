@@ -1,11 +1,35 @@
 "use client";
 
-import { useState } from "react";
-import { SIMULATION_TAGS, TAG_LABELS, VENUE_TYPES, VENUE_TYPE_LABELS } from "@/lib/types";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { buildReportUrl } from "@/lib/report-url";
+import {
+  REPORT_TOPIC_HINTS,
+  REPORT_TOPIC_LABELS,
+  type ReportTopic,
+  isReportTopic,
+} from "@/lib/report-topics";
+import { SIM_DIVISION_LABELS, SIM_DIVISIONS } from "@/lib/sim-prices";
+import {
+  SIMULATION_TAGS,
+  TAG_LABELS,
+  VENUE_TYPES,
+  VENUE_TYPE_LABELS,
+  type VenueDTO,
+} from "@/lib/types";
 
 const DEFAULT_CENTER = { lat: 37.5665, lng: 126.978 };
 
 export function ReportForm() {
+  const searchParams = useSearchParams();
+  const venueSlug = searchParams.get("venue");
+  const topicParam = searchParams.get("topic");
+  const focusTopic = isReportTopic(topicParam) ? topicParam : null;
+
+  const [isUpdate, setIsUpdate] = useState(Boolean(venueSlug));
+  const [targetVenue, setTargetVenue] = useState<VenueDTO | null>(null);
+  const [loadingVenue, setLoadingVenue] = useState(Boolean(venueSlug));
+
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [lat, setLat] = useState(DEFAULT_CENTER.lat);
@@ -15,11 +39,64 @@ export function ReportForm() {
   const [tags, setTags] = useState<string[]>([]);
   const [evidenceUrl, setEvidenceUrl] = useState("");
   const [dropInInfo, setDropInInfo] = useState("");
+  const [simScheduleNote, setSimScheduleNote] = useState("");
+  const [outdoorRunNote, setOutdoorRunNote] = useState("");
+  const [instagram, setInstagram] = useState("");
+  const [naverReservation, setNaverReservation] = useState("");
+  const [website, setWebsite] = useState("");
+  const [simPriceSingle, setSimPriceSingle] = useState("");
+  const [simPriceDouble, setSimPriceDouble] = useState("");
+  const [simPriceRelay, setSimPriceRelay] = useState("");
+  const [priceNote, setPriceNote] = useState("");
   const [reporterContact, setReporterContact] = useState("");
   const [consent, setConsent] = useState(false);
-  const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">(
+    "idle"
+  );
   const [reportId, setReportId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const scrolledRef = useRef(false);
+
+  useEffect(() => {
+    if (!venueSlug) return;
+    setLoadingVenue(true);
+    fetch(`/api/venues/${venueSlug}`)
+      .then((r) => r.json())
+      .then((data) => {
+        const v = data.venue as VenueDTO | undefined;
+        if (!v) return;
+        setTargetVenue(v);
+        setIsUpdate(true);
+        setName(v.name);
+        setAddress(v.address);
+        setLat(v.lat);
+        setLng(v.lng);
+        setVenueType(v.venueType);
+        setTags(v.tags);
+        setDropInInfo(v.dropInInfo ?? "");
+        setSimScheduleNote(v.simScheduleNote ?? "");
+        setOutdoorRunNote(v.outdoorRunNote ?? "");
+        setInstagram(v.links.instagram ?? "");
+        setNaverReservation(v.links.reservation ?? "");
+        setWebsite(v.links.website ?? "");
+        setSimPriceSingle(v.simPriceSingle ?? "");
+        setSimPriceDouble(v.simPriceDouble ?? "");
+        setSimPriceRelay(v.simPriceRelay ?? "");
+        setPriceNote(v.priceNote ?? "");
+        if (focusTopic) {
+          setExperienceNote(REPORT_TOPIC_HINTS[focusTopic]);
+        }
+      })
+      .finally(() => setLoadingVenue(false));
+  }, [venueSlug, focusTopic]);
+
+  useEffect(() => {
+    if (!focusTopic || scrolledRef.current || loadingVenue) return;
+    scrolledRef.current = true;
+    const el = document.getElementById(`section-${focusTopic}`);
+    el?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [focusTopic, loadingVenue]);
 
   const toggleTag = (tag: string) => {
     setTags((prev) =>
@@ -40,15 +117,27 @@ export function ReportForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          reportKind: isUpdate ? "update" : "new",
+          targetVenueSlug: isUpdate ? venueSlug ?? undefined : undefined,
+          reportTopics: focusTopic ? [focusTopic] : undefined,
           name,
           address,
           lat,
           lng,
           venueType,
           experienceNote,
-          tags,
+          tags: tags.length ? tags : undefined,
           evidenceUrls: [evidenceUrl],
-          dropInInfo: dropInInfo || undefined,
+          dropInInfo: dropInInfo.trim() || undefined,
+          simScheduleNote: simScheduleNote.trim() || undefined,
+          outdoorRunNote: outdoorRunNote.trim() || undefined,
+          instagram: instagram.trim() || undefined,
+          naverReservation: naverReservation.trim() || undefined,
+          website: website.trim() || undefined,
+          simPriceSingle: simPriceSingle.trim() || undefined,
+          simPriceDouble: simPriceDouble.trim() || undefined,
+          simPriceRelay: simPriceRelay.trim() || undefined,
+          priceNote: priceNote.trim() || undefined,
           reporterContact: reporterContact || undefined,
           consent: true,
         }),
@@ -73,87 +162,117 @@ export function ReportForm() {
         <p className="mt-2 text-sm text-zinc-600">
           검수 후 3~5영업일 내 지도에 반영됩니다.
         </p>
-        <a href="/" className="mt-4 inline-block text-sm font-medium text-zinc-900 underline">
+        <a
+          href="/"
+          className="mt-4 inline-block text-sm font-medium text-zinc-900 underline"
+        >
           지도로 돌아가기
         </a>
       </div>
     );
   }
 
+  if (loadingVenue) {
+    return <p className="text-sm text-zinc-500">시설 정보 불러오는 중…</p>;
+  }
+
+  const sectionClass = (topic: ReportTopic) =>
+    `scroll-mt-24 rounded-xl border p-4 ${
+      focusTopic === topic
+        ? "border-hyrox-yellow bg-hyrox-yellow/10"
+        : "border-zinc-200 bg-zinc-50"
+    }`;
+
   return (
-    <form onSubmit={submit} className="mx-auto max-w-lg space-y-4">
-      <div>
-        <label className="text-sm font-medium">시설명 *</label>
-        <input
-          required
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
-        />
-      </div>
-      <div>
-        <label className="text-sm font-medium">주소 *</label>
-        <input
-          required
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
-        />
-      </div>
-      <div className="grid grid-cols-2 gap-2">
-        <div>
-          <label className="text-xs text-zinc-500">위도</label>
-          <input
-            type="number"
-            step="any"
-            value={lat}
-            onChange={(e) => setLat(parseFloat(e.target.value))}
-            className="w-full rounded-lg border border-zinc-300 px-2 py-1 text-sm"
-          />
+    <form onSubmit={submit} className="mx-auto max-w-lg space-y-5">
+      {isUpdate && targetVenue && (
+        <div className="rounded-lg border border-hyrox-yellow/40 bg-hyrox-yellow/10 px-4 py-3 text-sm">
+          <p className="font-semibold text-zinc-900">
+            「{targetVenue.name}」 정보 수정 제보
+          </p>
+          {focusTopic && (
+            <p className="mt-1 text-zinc-600">
+              항목: {REPORT_TOPIC_LABELS[focusTopic]}
+            </p>
+          )}
+          <p className="mt-1 text-xs text-zinc-500">
+            바꾸려는 항목만 수정해도 됩니다. 증빙 URL은 필수입니다.
+          </p>
         </div>
-        <div>
-          <label className="text-xs text-zinc-500">경도</label>
-          <input
-            type="number"
-            step="any"
-            value={lng}
-            onChange={(e) => setLng(parseFloat(e.target.value))}
-            className="w-full rounded-lg border border-zinc-300 px-2 py-1 text-sm"
-          />
-        </div>
-      </div>
-      <p className="text-xs text-zinc-500">
-        MVP: 주소 검색·지도 핀은 추후 연동. 네이버/카카오맵에서 좌표를 복사해 넣을 수 있습니다.
-      </p>
-      <div>
-        <label className="text-sm font-medium">시설 유형 *</label>
-        <select
-          value={venueType}
-          onChange={(e) => setVenueType(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
-        >
-          {VENUE_TYPES.map((t) => (
-            <option key={t} value={t}>
-              {VENUE_TYPE_LABELS[t]}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div>
-        <label className="text-sm font-medium">체험 내용 *</label>
-        <textarea
-          required
-          minLength={20}
-          rows={4}
-          value={experienceNote}
-          onChange={(e) => setExperienceNote(e.target.value)}
-          placeholder="예: 야외 1km 런 후 실내에서 슬래드·로잉 스테이션 가능"
-          className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
-        />
-      </div>
-      <div>
-        <label className="text-sm font-medium">가능한 환경 *</label>
-        <div className="mt-2 flex flex-wrap gap-2">
+      )}
+
+      {!isUpdate && (
+        <>
+          <div>
+            <label className="text-sm font-medium">시설명 *</label>
+            <input
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium">주소 *</label>
+            <input
+              required
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-xs text-zinc-500">위도</label>
+              <input
+                type="number"
+                step="any"
+                value={lat}
+                onChange={(e) => setLat(parseFloat(e.target.value))}
+                className="w-full rounded-lg border border-zinc-300 px-2 py-1 text-sm"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-zinc-500">경도</label>
+              <input
+                type="number"
+                step="any"
+                value={lng}
+                onChange={(e) => setLng(parseFloat(e.target.value))}
+                className="w-full rounded-lg border border-zinc-300 px-2 py-1 text-sm"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="text-sm font-medium">시설 유형 *</label>
+            <select
+              value={venueType}
+              onChange={(e) => setVenueType(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
+            >
+              {VENUE_TYPES.map((t) => (
+                <option key={t} value={t}>
+                  {VENUE_TYPE_LABELS[t]}
+                </option>
+              ))}
+            </select>
+          </div>
+        </>
+      )}
+
+      {isUpdate && (
+        <input type="hidden" name="name" value={name} />
+      )}
+
+      <section id="section-simulation" className={sectionClass("simulation")}>
+        <h2 className="text-sm font-semibold text-zinc-900">
+          {REPORT_TOPIC_LABELS.simulation}
+          {!isUpdate && " *"}
+        </h2>
+        <p className="mt-1 text-xs text-zinc-500">
+          {REPORT_TOPIC_HINTS.simulation}
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
           {SIMULATION_TAGS.map((tag) => (
             <button
               key={tag}
@@ -161,15 +280,156 @@ export function ReportForm() {
               onClick={() => toggleTag(tag)}
               className={`rounded-full px-3 py-1 text-xs ${
                 tags.includes(tag)
-                  ? "bg-zinc-900 text-white"
-                  : "bg-zinc-100 text-zinc-700"
+                  ? "bg-hyrox-yellow text-hyrox-black"
+                  : "bg-white text-zinc-700 ring-1 ring-zinc-200"
               }`}
             >
               {TAG_LABELS[tag]}
             </button>
           ))}
         </div>
+        <div className="mt-3">
+          <label className="text-xs text-zinc-600">야외 런 메모 (선택)</label>
+          <input
+            value={outdoorRunNote}
+            onChange={(e) => setOutdoorRunNote(e.target.value)}
+            placeholder="예: 인근 한강 1km 왕복"
+            className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
+          />
+        </div>
+      </section>
+
+      <section id="section-dropin" className={sectionClass("dropin")}>
+        <h2 className="text-sm font-semibold text-zinc-900">
+          {REPORT_TOPIC_LABELS.dropin}
+        </h2>
+        <p className="mt-1 text-xs text-zinc-500">{REPORT_TOPIC_HINTS.dropin}</p>
+        <textarea
+          value={dropInInfo}
+          onChange={(e) => setDropInInfo(e.target.value)}
+          rows={3}
+          placeholder="예: 토요일 오전 시뮬 클래스, 인스타 DM 예약"
+          className="mt-3 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
+        />
+      </section>
+
+      <section id="section-links" className={sectionClass("links")}>
+        <h2 className="text-sm font-semibold text-zinc-900">
+          {REPORT_TOPIC_LABELS.links}
+        </h2>
+        <p className="mt-1 text-xs text-zinc-500">{REPORT_TOPIC_HINTS.links}</p>
+        <div className="mt-3 space-y-2">
+          <div>
+            <label className="text-xs font-medium text-zinc-600">
+              인스타그램
+            </label>
+            <input
+              value={instagram}
+              onChange={(e) => setInstagram(e.target.value)}
+              placeholder="@boxname 또는 https://instagram.com/..."
+              className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-zinc-600">
+              네이버 예약
+            </label>
+            <input
+              value={naverReservation}
+              onChange={(e) => setNaverReservation(e.target.value)}
+              placeholder="https://booking.naver.com/..."
+              className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-zinc-500">홈페이지 (선택)</label>
+            <input
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              placeholder="https://"
+              className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section id="section-hours" className={sectionClass("hours")}>
+        <h2 className="text-sm font-semibold text-zinc-900">
+          {REPORT_TOPIC_LABELS.hours}
+        </h2>
+        <p className="mt-1 text-xs text-zinc-500">{REPORT_TOPIC_HINTS.hours}</p>
+        <textarea
+          value={simScheduleNote}
+          onChange={(e) => setSimScheduleNote(e.target.value)}
+          rows={2}
+          placeholder="예: 매주 토 10:00 / 일 14:00 시뮬 오픈"
+          className="mt-3 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
+        />
+      </section>
+
+      <section id="section-prices" className={sectionClass("prices")}>
+        <h2 className="text-sm font-semibold text-zinc-900">
+          {REPORT_TOPIC_LABELS.prices}
+        </h2>
+        <p className="mt-1 text-xs text-zinc-500">{REPORT_TOPIC_HINTS.prices}</p>
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          {SIM_DIVISIONS.map((division) => {
+            const value =
+              division === "single"
+                ? simPriceSingle
+                : division === "double"
+                  ? simPriceDouble
+                  : simPriceRelay;
+            const setValue =
+              division === "single"
+                ? setSimPriceSingle
+                : division === "double"
+                  ? setSimPriceDouble
+                  : setSimPriceRelay;
+            return (
+              <div key={division}>
+                <label className="text-xs font-medium text-zinc-600">
+                  {SIM_DIVISION_LABELS[division]}
+                </label>
+                <input
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  placeholder="예: 3만원"
+                  className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
+                />
+              </div>
+            );
+          })}
+        </div>
+        <div className="mt-3">
+          <label className="text-xs text-zinc-500">기타 요금 참고</label>
+          <input
+            value={priceNote}
+            onChange={(e) => setPriceNote(e.target.value)}
+            className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
+          />
+        </div>
+      </section>
+
+      <div>
+        <label className="text-sm font-medium">
+          제보 내용 · 확인 경위 *
+        </label>
+        <textarea
+          required
+          minLength={isUpdate ? 10 : 20}
+          rows={4}
+          value={experienceNote}
+          onChange={(e) => setExperienceNote(e.target.value)}
+          placeholder={
+            isUpdate
+              ? "어떻게 확인했는지, 무엇이 맞/틀렸는지 적어주세요."
+              : "방문·인스타·예약 페이지 등 확인 내용"
+          }
+          className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
+        />
       </div>
+
       <div>
         <label className="text-sm font-medium">증빙 URL *</label>
         <input
@@ -177,20 +437,13 @@ export function ReportForm() {
           type="url"
           value={evidenceUrl}
           onChange={(e) => setEvidenceUrl(e.target.value)}
-          placeholder="https://..."
+          placeholder="인스타 게시물, 네이버 예약, 블로그 등"
           className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
         />
       </div>
+
       <div>
-        <label className="text-sm text-zinc-600">드랍인·시뮬 정보 (선택)</label>
-        <input
-          value={dropInInfo}
-          onChange={(e) => setDropInInfo(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
-        />
-      </div>
-      <div>
-        <label className="text-sm text-zinc-600">연락처 (선택, 검수 알림)</label>
+        <label className="text-sm text-zinc-600">연락처 (선택)</label>
         <input
           type="email"
           value={reporterContact}
@@ -198,6 +451,7 @@ export function ReportForm() {
           className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
         />
       </div>
+
       <label className="flex items-start gap-2 text-sm">
         <input
           type="checkbox"
@@ -211,10 +465,18 @@ export function ReportForm() {
       <button
         type="submit"
         disabled={status === "loading"}
-        className="w-full rounded-lg bg-zinc-900 py-3 font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+        className="w-full rounded-lg bg-hyrox-yellow py-3 font-bold text-hyrox-black hover:bg-hyrox-yellow-hover disabled:opacity-50"
       >
         {status === "loading" ? "제출 중…" : "제보 제출"}
       </button>
+
+      {isUpdate && venueSlug && (
+        <p className="text-center text-xs text-zinc-500">
+          <a href={buildReportUrl(venueSlug)} className="underline">
+            다른 항목도 함께 제보하기
+          </a>
+        </p>
+      )}
     </form>
   );
 }

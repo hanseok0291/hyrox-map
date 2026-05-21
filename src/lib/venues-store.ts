@@ -21,7 +21,11 @@ function seedToVenue(row: SeedVenue, index: number): Venue {
     tags: JSON.stringify(row.tags),
     outdoorRunNote: row.outdoor_run_note ?? null,
     dropInInfo: row.drop_in_info ?? null,
+    simScheduleNote: row.sim_schedule_note ?? null,
     priceNote: row.price_note ?? null,
+    simPriceSingle: row.sim_price_single ?? null,
+    simPriceDouble: row.sim_price_double ?? null,
+    simPriceRelay: row.sim_price_relay ?? null,
     dropInAvailable: row.drop_in_available ?? false,
     links: JSON.stringify(row.links ?? {}),
     officialClubId: row.official_club_id ?? null,
@@ -33,22 +37,42 @@ function seedToVenue(row: SeedVenue, index: number): Venue {
   };
 }
 
+let seedVenuesCache: Venue[] | null = null;
+
 function loadSeedVenues(): Venue[] {
+  if (seedVenuesCache) return seedVenuesCache;
   const path = join(process.cwd(), "data", "seed-venues.json");
   const rows = JSON.parse(readFileSync(path, "utf-8")) as SeedVenue[];
-  return rows.map(seedToVenue);
+  seedVenuesCache = rows.map(seedToVenue);
+  return seedVenuesCache;
+}
+
+let publishedVenuesCache: Venue[] | null = null;
+
+/** 시드 JSON 변경 후 dev 서버 재시작 또는 호출로 캐시 초기화 */
+export function clearVenuesCache() {
+  seedVenuesCache = null;
+  publishedVenuesCache = null;
 }
 
 export async function listPublishedVenues(): Promise<Venue[]> {
+  if (publishedVenuesCache) return publishedVenuesCache;
+
   try {
     const venues = await prisma.venue.findMany({
       where: { publishedAt: { not: null }, flagged: false },
     });
-    if (venues.length > 0) return venues;
+    if (venues.length > 0) {
+      publishedVenuesCache = venues;
+      return venues;
+    }
   } catch {
     // SQLite/Postgres unavailable (e.g. Vercel without DATABASE_URL)
   }
-  return loadSeedVenues();
+
+  const seed = loadSeedVenues();
+  publishedVenuesCache = seed;
+  return seed;
 }
 
 export async function getVenueBySlug(slug: string): Promise<Venue | null> {

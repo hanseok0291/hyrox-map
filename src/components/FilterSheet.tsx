@@ -79,7 +79,7 @@ export function FilterSheet({
                   onClick={() => toggleTag(tag)}
                   className={`rounded-full px-2.5 py-1 text-[11px] ${
                     filters.tags.includes(tag)
-                      ? "bg-white text-zinc-900"
+                      ? "bg-hyrox-yellow text-hyrox-black"
                       : "bg-white/10 text-white/75"
                   }`}
                 >
@@ -125,7 +125,7 @@ export function FilterSheet({
             onClick={() => toggleTag(tag)}
             className={`rounded-full px-3 py-1 text-xs ${
               filters.tags.includes(tag)
-                ? "bg-zinc-900 text-white"
+                ? "bg-hyrox-yellow text-hyrox-black"
                 : "bg-zinc-100 text-zinc-700"
             }`}
           >

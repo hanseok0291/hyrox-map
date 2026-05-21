@@ -25,7 +25,7 @@ export function MapMobileChrome({
     <>
       {/* Top floating stack */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex flex-col gap-2 p-3 pt-[max(0.75rem,env(safe-area-inset-top))] lg:hidden">
-        <div className="pointer-events-auto rounded-2xl bg-[#2a2a2a]/88 px-3 py-2.5 shadow-lg backdrop-blur-md">
+        <div className="map-panel-surface pointer-events-auto rounded-2xl px-3 py-2.5 shadow-lg">
           <div className="relative">
             <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/45">
               ⌕
@@ -42,7 +42,7 @@ export function MapMobileChrome({
           </div>
         </div>
 
-        <div className="pointer-events-auto rounded-2xl bg-[#2a2a2a]/88 px-3 py-2.5 shadow-lg backdrop-blur-md">
+        <div className="map-panel-surface pointer-events-auto rounded-2xl px-3 py-2.5 shadow-lg">
           <p className="mb-2 text-[11px] font-medium text-white/55">
             {loading ? "불러오는 중…" : `근처 시뮬 가능 시설 ${venueCount}곳`}
           </p>
@@ -73,7 +73,7 @@ export function MapMobileChrome({
 
       {/* Bottom nav pill */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 flex justify-center px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden">
-        <nav className="pointer-events-auto flex w-full max-w-sm items-center gap-1 rounded-full bg-[#2a2a2a]/92 px-2 py-2 shadow-xl backdrop-blur-md">
+        <nav className="map-panel-surface pointer-events-auto flex w-full max-w-sm items-center gap-1 rounded-full px-2 py-2 shadow-xl">
           <button
             type="button"
             onClick={onOpenList}
@@ -90,7 +90,7 @@ export function MapMobileChrome({
 
           <Link
             href="/report"
-            className="flex flex-[1.4] items-center justify-center gap-1 rounded-full bg-zinc-900 px-4 py-3 text-sm font-bold text-white shadow-md hover:bg-zinc-800"
+            className="flex flex-[1.4] items-center justify-center gap-1 rounded-full bg-hyrox-yellow px-4 py-3 text-sm font-bold text-hyrox-black shadow-md hover:bg-hyrox-yellow-hover"
           >
             <span className="text-lg leading-none">+</span>
             제보

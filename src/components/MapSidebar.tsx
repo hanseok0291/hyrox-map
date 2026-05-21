@@ -31,7 +31,7 @@ export function MapSidebar({
       <button
         type="button"
         onClick={() => onCollapsedChange(false)}
-        className="absolute left-4 top-4 z-30 hidden h-11 w-11 items-center justify-center rounded-full bg-[#3d2c24]/95 text-white shadow-lg backdrop-blur-sm hover:bg-[#4a362c] lg:flex"
+        className="map-panel-surface absolute left-4 top-4 z-30 hidden h-11 w-11 items-center justify-center rounded-full text-white shadow-lg hover:bg-hyrox-black lg:flex"
         aria-label="패널 열기"
       >
         →
@@ -41,7 +41,7 @@ export function MapSidebar({
 
   return (
     <aside className="pointer-events-none absolute inset-y-0 left-0 z-30 hidden max-w-[400px] flex-col p-5 lg:flex">
-      <div className="pointer-events-auto flex h-full max-h-[calc(100dvh-2.5rem)] flex-col overflow-hidden rounded-2xl bg-[#3d2c24]/95 text-white shadow-2xl backdrop-blur-md">
+      <div className="map-panel-surface pointer-events-auto flex h-full max-h-[calc(100dvh-2.5rem)] flex-col overflow-hidden rounded-2xl text-white shadow-2xl">
         {/* Header */}
         <div className="flex items-start justify-between gap-2 border-b border-white/10 px-4 pb-3 pt-4">
           <div>
@@ -94,7 +94,7 @@ export function MapSidebar({
         <div className="shrink-0 border-t border-white/10 p-4">
           <Link
             href="/report"
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-zinc-900 py-3.5 text-sm font-semibold text-white shadow-lg hover:bg-zinc-800"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-hyrox-yellow py-3.5 text-sm font-bold text-hyrox-black shadow-lg hover:bg-hyrox-yellow-hover"
           >
             <span className="text-lg leading-none">+</span>
             시설 제보하기

@@ -14,7 +14,7 @@ export function SiteHeader() {
         </div>
         <Link
           href="/report"
-          className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+          className="rounded-lg bg-hyrox-yellow px-4 py-2 text-sm font-bold text-hyrox-black hover:bg-hyrox-yellow-hover"
         >
           시설 제보
         </Link>

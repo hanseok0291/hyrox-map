@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin } from "@/lib/admin";
 import { prisma } from "@/lib/db";
+import { mergeReportIntoVenue } from "@/lib/merge-venue-report";
 import { parseTags, slugify } from "@/lib/venue";
 
 export async function GET(
@@ -18,6 +19,9 @@ export async function GET(
       ...report,
       tags: parseTags(report.tags),
       evidenceUrls: JSON.parse(report.evidenceUrls) as string[],
+      reportTopics: report.reportTopics
+        ? (JSON.parse(report.reportTopics) as string[])
+        : [],
     },
   });
 }
@@ -63,7 +67,36 @@ export async function PATCH(
   }
 
   if (body.action === "approve") {
-    const tags = parseTags(report.tags);
+    if (report.reportKind === "update" && report.targetVenueSlug) {
+      const existing = await prisma.venue.findUnique({
+        where: { slug: report.targetVenueSlug },
+      });
+      if (!existing) {
+        return NextResponse.json(
+          { error: "Target venue not found" },
+          { status: 404 }
+        );
+      }
+
+      const merged = mergeReportIntoVenue(existing, report);
+      const venue = await prisma.venue.update({
+        where: { id: existing.id },
+        data: merged,
+      });
+
+      await prisma.report.update({
+        where: { id },
+        data: {
+          status: "approved",
+          mergedIntoVenueId: venue.id,
+          moderatorNote: body.moderatorNote,
+          reviewedAt: new Date(),
+        },
+      });
+
+      return NextResponse.json({ ok: true, venueSlug: venue.slug });
+    }
+
     const baseSlug = slugify(report.name);
     let slug = baseSlug;
     let n = 1;
@@ -83,13 +116,18 @@ export async function PATCH(
         trustLevel: (body.trustLevel ?? "community") as never,
         source: "community_report",
         tags: report.tags,
-        outdoorRunNote: null,
+        outdoorRunNote: report.outdoorRunNote,
         dropInInfo: report.dropInInfo,
+        simScheduleNote: report.simScheduleNote,
         priceNote: report.priceNote,
+        simPriceSingle: report.simPriceSingle,
+        simPriceDouble: report.simPriceDouble,
+        simPriceRelay: report.simPriceRelay,
         dropInAvailable: Boolean(report.dropInInfo),
         links: JSON.stringify({
           website: report.website ?? "",
           instagram: report.instagram ?? "",
+          reservation: report.naverReservation ?? "",
         }),
         experienceNote: report.experienceNote,
         publishedAt: new Date(),
