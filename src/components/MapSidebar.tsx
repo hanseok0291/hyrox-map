@@ -13,6 +13,7 @@ export function MapSidebar({
   selectedId,
   onVenueSelect,
   onMyLocation,
+  radiusKm,
   collapsed,
   onCollapsedChange,
 }: {
@@ -23,6 +24,7 @@ export function MapSidebar({
   selectedId: string | null;
   onVenueSelect: (venue: VenueDTO) => void;
   onMyLocation: () => void;
+  radiusKm: number;
   collapsed: boolean;
   onCollapsedChange: (v: boolean) => void;
 }) {
@@ -71,7 +73,9 @@ export function MapSidebar({
 
           <div className="flex items-center justify-between px-4 py-2">
             <span className="text-xs font-medium text-white/70">
-              근처 시설 {loading ? "…" : `(${venues.length})`}
+              {loading
+                ? "불러오는 중…"
+                : `반경 ${radiusKm}km · ${venues.length}곳`}
             </span>
             <button
               type="button"

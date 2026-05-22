@@ -8,6 +8,7 @@ export function MapMobileChrome({
   filters,
   onFiltersChange,
   venueCount,
+  radiusKm,
   loading,
   onOpenList,
   onOpenFilter,
@@ -16,6 +17,7 @@ export function MapMobileChrome({
   filters: VenueFilters;
   onFiltersChange: (f: VenueFilters) => void;
   venueCount: number;
+  radiusKm: number;
   loading: boolean;
   onOpenList: () => void;
   onOpenFilter: () => void;
@@ -44,7 +46,9 @@ export function MapMobileChrome({
 
         <div className="map-panel-surface pointer-events-auto rounded-2xl px-3 py-2.5 shadow-lg">
           <p className="mb-2 text-[11px] font-medium text-white/55">
-            {loading ? "불러오는 중…" : `근처 시뮬 가능 시설 ${venueCount}곳`}
+            {loading
+              ? "불러오는 중…"
+              : `반경 ${radiusKm}km · 시설 ${venueCount}곳`}
           </p>
           <QuickFilterChips filters={filters} onChange={onFiltersChange} />
         </div>

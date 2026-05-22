@@ -1,10 +1,13 @@
 "use client";
 
+import {
+  getKakaoMapKey,
+  isKakaoMapDisabledByEnv,
+} from "@/lib/kakao-map";
 import type { VenueDTO } from "@/lib/types";
 
 /**
- * Kakao Map SDK placeholder until NEXT_PUBLIC_KAKAO_MAP_KEY is set.
- * Set key in .env.local — see README.
+ * 카카오맵 미사용 시 플레이스홀더 (키 없음 · 로컬 DISABLE_MAP).
  */
 export function MapPlaceholder({
   venues,
@@ -15,17 +18,40 @@ export function MapPlaceholder({
   center: { lat: number; lng: number };
   onSelect?: (venue: VenueDTO) => void;
 }) {
-  const hasKey = Boolean(process.env.NEXT_PUBLIC_KAKAO_MAP_KEY);
+  const disabled = isKakaoMapDisabledByEnv();
+  const hasKey = Boolean(getKakaoMapKey());
 
   return (
     <div className="relative h-full min-h-0 w-full bg-zinc-100">
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-4 text-center">
-        {!hasKey ? (
+        {disabled ? (
           <>
-            <p className="text-sm font-medium text-zinc-700">지도 영역</p>
+            <p className="text-sm font-medium text-zinc-700">
+              지도 끔 (로컬 개발 모드)
+            </p>
             <p className="max-w-xs text-xs text-zinc-500">
-              `.env.local`에 `NEXT_PUBLIC_KAKAO_MAP_KEY`를 설정하면 카카오맵이
-              표시됩니다. 현재는 목록·핀 좌표만 사용합니다.
+              `.env.local`의 `NEXT_PUBLIC_DISABLE_MAP=1` 때문에 카카오맵을
+              불러오지 않습니다. 목록·상세는 그대로 테스트할 수 있습니다.
+            </p>
+            <p className="text-[11px] text-zinc-400">
+              배포(Vercel)에는 이 변수를 넣지 않으면 지도가 켜집니다.
+            </p>
+          </>
+        ) : !hasKey ? (
+          <>
+            <p className="text-sm font-medium text-zinc-700">
+              카카오맵 키가 없습니다
+            </p>
+            <p className="max-w-sm text-xs text-zinc-500">
+              `.env` 또는 `.env.local`에{" "}
+              <code className="text-zinc-700">NEXT_PUBLIC_KAKAO_MAP_KEY</code>에
+              카카오 <strong>JavaScript 키</strong>를 넣어 주세요. (
+              <code>KAKAO_REST_API_KEY</code>와는 다른 키입니다.) 빈 문자열{" "}
+              <code>&quot;&quot;</code> 이면 동작하지 않습니다.
+            </p>
+            <p className="text-[11px] text-zinc-400">
+              developers.kakao.com → 앱 → 앱 키 · Web 플랫폼에
+              http://localhost:3000 등록
             </p>
           </>
         ) : (

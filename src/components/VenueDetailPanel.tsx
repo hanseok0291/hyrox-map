@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { ReportSectionCard } from "@/components/ReportSectionCard";
+import { useVenuePhoto } from "@/hooks/useVenuePhoto";
 import { SimPriceCards } from "@/components/SimPriceCards";
 import { buildReportUrl } from "@/lib/report-url";
 import type { VenueDTO } from "@/lib/types";
@@ -39,7 +40,10 @@ export function VenueDetailPanel({
 }) {
   const [tab, setTab] = useState<"home" | "info">("home");
   const [copied, setCopied] = useState(false);
+  const { photoUrl, showImage, onImageError } = useVenuePhoto(venue.slug);
   const distance = formatDistance(venue.distanceKm);
+  const venueTypeLabel =
+    VENUE_TYPE_LABELS[venue.venueType] ?? venue.venueType;
   const kakaoDirections = `https://map.kakao.com/link/map/${encodeURIComponent(venue.name)},${venue.lat},${venue.lng}`;
   const shareUrl =
     typeof window !== "undefined"
@@ -103,14 +107,34 @@ export function VenueDetailPanel({
       <div className="min-h-0 flex-1 overflow-y-auto">
         {/* Hero */}
         <div className="relative mx-4 mt-3 aspect-[16/10] overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-700 via-zinc-800 to-zinc-900">
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
-            <span className="text-4xl font-bold text-white/25">
-              {venue.name.charAt(0)}
-            </span>
-            <span className="mt-2 text-xs text-white/50">
-              {VENUE_TYPE_LABELS[venue.venueType] ?? venue.venueType}
-            </span>
-          </div>
+          {showImage && photoUrl ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={photoUrl}
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover"
+                decoding="async"
+                onError={onImageError}
+              />
+              <div
+                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/20"
+                aria-hidden
+              />
+              <span className="pointer-events-none absolute bottom-10 left-3 text-xs font-medium text-white/80">
+                {venueTypeLabel}
+              </span>
+            </>
+          ) : (
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
+              <span className="text-4xl font-bold text-white/25">
+                {venue.name.charAt(0)}
+              </span>
+              <span className="mt-2 text-xs text-white/50">
+                {venueTypeLabel}
+              </span>
+            </div>
+          )}
           <button
             type="button"
             onClick={onClose}
@@ -238,6 +262,22 @@ export function VenueDetailPanel({
         <div className="space-y-3 px-4 py-4 pb-8">
           {tab === "home" && (
             <>
+              <ReportSectionCard
+                venueSlug={venue.slug}
+                topic="location"
+                title="상호 · 주소 · 지도 위치"
+                badge="정보 수정"
+                emptyText="상호 변경, 이전, 핀 위치 오류 등을 제보해 주세요."
+              >
+                <p className="text-xs leading-relaxed text-white/60">
+                  {venue.name}
+                  <br />
+                  {venue.address}
+                  <br />
+                  좌표: {venue.lat.toFixed(5)}, {venue.lng.toFixed(5)}
+                </p>
+              </ReportSectionCard>
+
               <ReportSectionCard
                 venueSlug={venue.slug}
                 topic="simulation"

@@ -28,7 +28,9 @@ export function KakaoMap({
 
   onSelectRef.current = onSelect;
 
-  const venuesKey = venues.map((v) => v.id).join(",");
+  const venuesKey = venues
+    .map((v) => `${v.id}@${v.lat.toFixed(6)},${v.lng.toFixed(6)}`)
+    .join("|");
 
   useEffect(() => {
     venuesByIdRef.current = new Map(venues.map((v) => [v.id, v]));

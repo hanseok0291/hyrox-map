@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { isAdmin } from "@/lib/admin";
 import { prisma } from "@/lib/db";
 import { mergeReportIntoVenue } from "@/lib/merge-venue-report";
-import { parseTags, slugify } from "@/lib/venue";
+import type { VenueSnapshot } from "@/lib/report-diff";
+import { parseLinks, parseTags, slugify } from "@/lib/venue";
+import { clearVenuesCache } from "@/lib/venues-store";
 
 export async function GET(
   request: NextRequest,
@@ -14,6 +16,43 @@ export async function GET(
   const { id } = await params;
   const report = await prisma.report.findUnique({ where: { id } });
   if (!report) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  let targetVenue: VenueSnapshot | null = null;
+  if (report.reportKind === "update" && report.targetVenueSlug) {
+    const venue = await prisma.venue.findUnique({
+      where: { slug: report.targetVenueSlug },
+    });
+    if (venue) {
+      const links = parseLinks(venue.links);
+      targetVenue = {
+        name: venue.name,
+        address: venue.address,
+        region: venue.region,
+        lat: venue.lat,
+        lng: venue.lng,
+        tags: parseTags(venue.tags),
+        dropInInfo: venue.dropInInfo,
+        simScheduleNote: venue.simScheduleNote,
+        outdoorRunNote: venue.outdoorRunNote,
+        priceNote: venue.priceNote,
+        simPriceSingle: venue.simPriceSingle,
+        simPriceDouble: venue.simPriceDouble,
+        simPriceRelay: venue.simPriceRelay,
+        links: {
+          website: links.website,
+          instagram: links.instagram,
+          reservation: links.reservation,
+        },
+      };
+    }
+  }
+
+  const links = {
+    website: report.website ?? undefined,
+    instagram: report.instagram ?? undefined,
+    reservation: report.naverReservation ?? undefined,
+  };
+
   return NextResponse.json({
     report: {
       ...report,
@@ -22,7 +61,9 @@ export async function GET(
       reportTopics: report.reportTopics
         ? (JSON.parse(report.reportTopics) as string[])
         : [],
+      links,
     },
+    targetVenue,
   });
 }
 
@@ -94,6 +135,8 @@ export async function PATCH(
         },
       });
 
+      clearVenuesCache();
+
       return NextResponse.json({ ok: true, venueSlug: venue.slug });
     }
 
@@ -143,6 +186,8 @@ export async function PATCH(
         reviewedAt: new Date(),
       },
     });
+
+    clearVenuesCache();
 
     return NextResponse.json({ ok: true, venueSlug: venue.slug });
   }

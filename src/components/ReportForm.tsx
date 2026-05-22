@@ -2,13 +2,16 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { LocationFields } from "@/components/LocationFields";
 import { buildReportUrl } from "@/lib/report-url";
+import { coordinatesChanged } from "@/lib/venue-location";
 import {
   REPORT_TOPIC_HINTS,
   REPORT_TOPIC_LABELS,
   type ReportTopic,
   isReportTopic,
 } from "@/lib/report-topics";
+import { parseJsonResponse } from "@/lib/parse-json-response";
 import { SIM_DIVISION_LABELS, SIM_DIVISIONS } from "@/lib/sim-prices";
 import {
   SIMULATION_TAGS,
@@ -111,6 +114,33 @@ export function ReportForm() {
       setError("개인정보 수집에 동의해 주세요.");
       return;
     }
+    if (!evidenceUrl.trim()) {
+      setError("증빙 URL을 입력해 주세요.");
+      return;
+    }
+    const noteLen = experienceNote.trim().length;
+    const minNote = isUpdate ? 10 : 20;
+    if (noteLen < minNote) {
+      setError(
+        isUpdate
+          ? "「제보 내용 · 확인 경위」를 10자 이상 적어 주세요. (어디서 확인했는지)"
+          : "「제보 내용 · 확인 경위」를 20자 이상 적어 주세요."
+      );
+      return;
+    }
+    const reportTopics: ReportTopic[] = [];
+    if (focusTopic) reportTopics.push(focusTopic);
+    if (
+      isUpdate &&
+      targetVenue &&
+      (focusTopic === "location" ||
+        coordinatesChanged(targetVenue.lat, targetVenue.lng, lat, lng) ||
+        address.trim() !== targetVenue.address.trim() ||
+        name.trim() !== targetVenue.name.trim())
+    ) {
+      if (!reportTopics.includes("location")) reportTopics.push("location");
+    }
+
     setStatus("loading");
     try {
       const res = await fetch("/api/reports", {
@@ -119,7 +149,7 @@ export function ReportForm() {
         body: JSON.stringify({
           reportKind: isUpdate ? "update" : "new",
           targetVenueSlug: isUpdate ? venueSlug ?? undefined : undefined,
-          reportTopics: focusTopic ? [focusTopic] : undefined,
+          reportTopics: reportTopics.length ? reportTopics : undefined,
           name,
           address,
           lat,
@@ -142,9 +172,17 @@ export function ReportForm() {
           consent: true,
         }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "제보 실패");
-      setReportId(data.id);
+      const data = await parseJsonResponse<{
+        id?: string;
+        error?: string;
+      }>(res);
+      if (!res.ok) {
+        const msg = data.error ?? "제보 실패";
+        throw new Error(
+          typeof msg === "string" && msg.includes("·") ? msg : msg
+        );
+      }
+      setReportId(data.id ?? null);
       setStatus("done");
     } catch (err) {
       setStatus("error");
@@ -260,8 +298,31 @@ export function ReportForm() {
         </>
       )}
 
-      {isUpdate && (
-        <input type="hidden" name="name" value={name} />
+      {isUpdate && targetVenue && (
+        <section
+          id="section-location"
+          className={sectionClass("location")}
+        >
+          <h2 className="text-sm font-semibold text-zinc-900">
+            {REPORT_TOPIC_LABELS.location}
+          </h2>
+          <p className="mt-1 text-xs text-zinc-500">
+            {REPORT_TOPIC_HINTS.location}
+          </p>
+          <div className="mt-3">
+            <LocationFields
+              name={name}
+              address={address}
+              lat={lat}
+              lng={lng}
+              showNameField
+              onNameChange={setName}
+              onAddressChange={setAddress}
+              onLatChange={setLat}
+              onLngChange={setLng}
+            />
+          </div>
+        </section>
       )}
 
       <section id="section-simulation" className={sectionClass("simulation")}>
@@ -461,7 +522,9 @@ export function ReportForm() {
         />
         <span>제보 처리를 위한 최소 개인정보 수집에 동의합니다.</span>
       </label>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && (
+        <p className="whitespace-pre-line text-sm text-red-600">{error}</p>
+      )}
       <button
         type="submit"
         disabled={status === "loading"}

@@ -36,8 +36,9 @@ git push -u origin main
 
 | Name | Value | 비고 |
 |------|-------|------|
-| `ADMIN_SECRET` | 긴 랜덤 문자열 | Admin 로그인 |
+| `ADMIN_SECRET` | 긴 랜덤 문자열 | Admin 로그인 (**Production·Preview 둘 다** 추가) |
 | `NEXT_PUBLIC_KAKAO_MAP_KEY` | JavaScript 키 | [KAKAO_MAP.md](./KAKAO_MAP.md) |
+| `KAKAO_REST_API_KEY` | REST API 키 (선택) | 사이드바 센터 썸네일 |
 | `DATABASE_URL` | Neon Postgres URL | 제보/Admin용 (아래 Neon 참고) |
 
 6. **Deploy**
@@ -68,6 +69,21 @@ DATABASE_URL="postgresql://..." npm run db:seed
 
 ---
 
+## ADMIN_SECRET 비밀번호 변경
+
+1. **로컬** — 프로젝트 루트 `.env`에서 `ADMIN_SECRET` 값 수정 후 `npm run dev` 재시작.
+2. **Vercel** — Dashboard → Settings → Environment Variables → `ADMIN_SECRET` **Edit** → 새 값 저장 (Production·Preview 모두).
+3. **배포 반영** — 환경 변수 변경 후 **Redeploy** 한 번 필요 (기존 배포는 이전 값 사용).
+4. **브라우저** — 예전에 로그인했다면 `admin_token` 쿠키 삭제 후 `/admin/login`에서 새 비밀번호 입력.
+
+로컬에서 강한 랜덤 값 생성 예:
+
+```bash
+openssl rand -base64 24
+```
+
+---
+
 ## 방법 B — Vercel CLI
 
 ```bash
@@ -92,7 +108,7 @@ npx vercel --prod
 ## 체크리스트
 
 - [ ] Vercel 프로젝트 생성
-- [ ] `ADMIN_SECRET` 설정
+- [ ] `ADMIN_SECRET` 설정 (Preview + Production — Preview만 비어 있으면 프리뷰 URL에서 Admin 로그인 불가)
 - [ ] (선택) `NEXT_PUBLIC_KAKAO_MAP_KEY` + 카카오 Web 도메인
 - [ ] (선택) `DATABASE_URL` + `db push` + `db:seed` — 제보/Admin
 - [ ] 배포 URL 접속 → 시설 목록 표시 확인

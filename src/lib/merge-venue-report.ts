@@ -1,4 +1,8 @@
 import type { Report, Venue } from "@prisma/client";
+import {
+  coordinatesChanged,
+  parseReportTopics,
+} from "@/lib/venue-location";
 import { parseLinks } from "@/lib/venue";
 
 /** 검수 승인 시 기존 시설에 제보 내용 병합 (빈 값은 건너뜀) */
@@ -15,7 +19,43 @@ export function mergeReportIntoVenue(
   const tags = report.tags?.trim();
   const hasTags = tags && tags !== "[]" && tags !== "null";
 
+  const topics = parseReportTopics(report.reportTopics);
+  const nameChanged =
+    report.name.trim() !== "" && report.name.trim() !== venue.name.trim();
+  const addressChanged =
+    report.address.trim() !== "" &&
+    report.address.trim() !== venue.address.trim();
+  const coordsChanged = coordinatesChanged(
+    venue.lat,
+    venue.lng,
+    report.lat,
+    report.lng
+  );
+  const mergePlace =
+    topics.includes("location") ||
+    nameChanged ||
+    addressChanged ||
+    coordsChanged;
+
+  const regionFromAddress = (address: string) => {
+    const part = address.trim().split(/\s+/)[0];
+    return part || venue.region;
+  };
+
   return {
+    ...(mergePlace
+      ? {
+          lat: report.lat,
+          lng: report.lng,
+          ...(nameChanged ? { name: report.name.trim() } : {}),
+          ...(addressChanged
+            ? {
+                address: report.address.trim(),
+                region: regionFromAddress(report.address),
+              }
+            : {}),
+        }
+      : {}),
     ...(hasTags ? { tags } : {}),
     ...(report.dropInInfo?.trim()
       ? { dropInInfo: report.dropInInfo.trim(), dropInAvailable: true }

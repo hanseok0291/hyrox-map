@@ -49,3 +49,14 @@ export function getKakaoMapKey(): string | undefined {
   const key = process.env.NEXT_PUBLIC_KAKAO_MAP_KEY?.trim();
   return key || undefined;
 }
+
+/** 로컬 개발 시 GPU·카카오 쿼터 절약용. Vercel에는 설정하지 않음. */
+export function isKakaoMapDisabledByEnv(): boolean {
+  const v = process.env.NEXT_PUBLIC_DISABLE_MAP?.trim().toLowerCase();
+  return v === "1" || v === "true" || v === "yes";
+}
+
+/** 키가 있고 DISABLE_MAP이 아니면 카카오맵 사용 */
+export function isKakaoMapEnabled(): boolean {
+  return Boolean(getKakaoMapKey()) && !isKakaoMapDisabledByEnv();
+}

@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import type { VenueDTO } from "@/lib/types";
-import { getKakaoMapKey } from "@/lib/kakao-map";
+import { isKakaoMapEnabled } from "@/lib/kakao-map";
 import { MapPlaceholder } from "./MapPlaceholder";
 
 const KakaoMap = dynamic(
@@ -18,7 +18,8 @@ const KakaoMap = dynamic(
 );
 
 /**
- * Kakao key가 있으면 KakaoMap, 없으면 Placeholder(안내 + 하단 칩).
+ * 카카오맵: NEXT_PUBLIC_KAKAO_MAP_KEY + DISABLE_MAP 미설정 시.
+ * 로컬 느리면 .env.local에 NEXT_PUBLIC_DISABLE_MAP=1 (선택).
  */
 export function MapView({
   venues,
@@ -31,9 +32,7 @@ export function MapView({
   onSelect?: (venue: VenueDTO) => void;
   selectedId?: string | null;
 }) {
-  const hasKey = Boolean(getKakaoMapKey());
-
-  if (!hasKey) {
+  if (!isKakaoMapEnabled()) {
     return (
       <MapPlaceholder venues={venues} center={center} onSelect={onSelect} />
     );

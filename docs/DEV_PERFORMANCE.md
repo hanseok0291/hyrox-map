@@ -44,7 +44,22 @@ npm run dev
 - KakaoMap **dynamic import** (초기 컴파일 분리)
 - 개발 모드 `reactStrictMode: false` (effect 이중 실행 완화)
 
-카카오 키 없이 가볍게 UI만 보려면 `.env.local`에서 `NEXT_PUBLIC_KAKAO_MAP_KEY`를 비우거나 주석 처리.
+### 로컬 지도 켜기
+
+| 항목 | 설정 |
+|------|------|
+| **필수** | `NEXT_PUBLIC_KAKAO_MAP_KEY` (JavaScript 키) — `.env` 또는 `.env.local` |
+| **플랫폼** | 카카오 Developers → Web에 `http://localhost:3000` 등록 |
+| **끄기 (선택)** | 느릴 때만 `.env.local`에 `NEXT_PUBLIC_DISABLE_MAP=1` |
+
+Vercel Production 키를 로컬에 받기:
+
+```bash
+npx vercel env pull .env.vercel.prod --environment=production --yes
+grep NEXT_PUBLIC_KAKAO_MAP_KEY .env.vercel.prod >> .env.local
+rm .env.vercel.prod
+npm run dev   # 재시작 필수
+```
 
 ---
 

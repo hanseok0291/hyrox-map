@@ -1,10 +1,11 @@
 import { z } from "zod";
 import { REPORT_TOPICS } from "./report-topics";
-import { SIMULATION_TAGS } from "./simulation-tags";
+import { sanitizeReportTags } from "./simulation-tags";
 import { VENUE_TYPES } from "./types";
 
 function hasUpdatePayload(data: {
   tags?: string[];
+  reportTopics?: string[];
   dropInInfo?: string;
   simScheduleNote?: string;
   outdoorRunNote?: string;
@@ -15,8 +16,10 @@ function hasUpdatePayload(data: {
   instagram?: string;
   naverReservation?: string;
   website?: string;
+  experienceNote?: string;
 }) {
   return Boolean(
+    data.reportTopics?.includes("location") ||
     (data.tags && data.tags.length > 0) ||
       data.dropInInfo?.trim() ||
       data.simScheduleNote?.trim() ||
@@ -27,7 +30,8 @@ function hasUpdatePayload(data: {
       data.simPriceRelay?.trim() ||
       data.instagram?.trim() ||
       data.naverReservation?.trim() ||
-      data.website?.trim()
+      data.website?.trim() ||
+      (data.experienceNote?.trim().length ?? 0) >= 10
   );
 }
 
@@ -40,9 +44,23 @@ const reportBodySchema = z.object({
   lat: z.number().min(33).max(39),
   lng: z.number().min(124).max(132),
   venueType: z.enum(VENUE_TYPES),
-  experienceNote: z.string().min(10).max(2000),
-  tags: z.array(z.enum(SIMULATION_TAGS)).optional(),
-  evidenceUrls: z.array(z.string().url()).min(1).max(5),
+  experienceNote: z.string().max(2000),
+  tags: z.array(z.string().max(50)).optional(),
+  evidenceUrls: z
+    .array(z.string().min(1).max(2000))
+    .min(1)
+    .max(5)
+    .refine(
+      (urls) => urls.every((u) => {
+        try {
+          new URL(u);
+          return true;
+        } catch {
+          return false;
+        }
+      }),
+      { message: "올바른 URL 형식이 아닙니다." }
+    ),
   dropInInfo: z.string().max(500).optional(),
   simScheduleNote: z.string().max(500).optional(),
   outdoorRunNote: z.string().max(500).optional(),
@@ -57,45 +75,53 @@ const reportBodySchema = z.object({
   consent: z.literal(true),
 });
 
-export const reportSchema = reportBodySchema.superRefine((data, ctx) => {
-  if (data.reportKind === "update") {
-    if (!data.targetVenueSlug) {
+export const reportSchema = reportBodySchema
+  .transform((data) => ({
+    ...data,
+    tags: sanitizeReportTags(data.tags),
+  }))
+  .superRefine((data, ctx) => {
+    const noteLen = data.experienceNote.trim().length;
+
+    if (data.reportKind === "update") {
+      if (!data.targetVenueSlug) {
+        ctx.addIssue({
+          code: "custom",
+          message: "수정 제보 대상 시설이 필요합니다.",
+          path: ["targetVenueSlug"],
+        });
+      }
+      if (!hasUpdatePayload(data)) {
+        ctx.addIssue({
+          code: "custom",
+          message:
+            "수정할 항목을 하나 이상 입력하거나, 제보 내용을 10자 이상 적어 주세요.",
+        });
+      }
+      if (noteLen < 10) {
+        ctx.addIssue({
+          code: "custom",
+          message: "제보 내용을 10자 이상 입력해 주세요.",
+          path: ["experienceNote"],
+        });
+      }
+      return;
+    }
+
+    if (!data.tags || data.tags.length < 1) {
       ctx.addIssue({
         code: "custom",
-        message: "수정 제보 대상 시설이 필요합니다.",
-        path: ["targetVenueSlug"],
+        message: "가능한 환경 태그를 1개 이상 선택해 주세요.",
+        path: ["tags"],
       });
     }
-    if (!hasUpdatePayload(data)) {
+    if (noteLen < 20) {
       ctx.addIssue({
         code: "custom",
-        message: "수정할 항목(태그, 안내, 시간, 가격, 링크 등)을 하나 이상 입력해 주세요.",
-      });
-    }
-    if (data.experienceNote.length < 10) {
-      ctx.addIssue({
-        code: "custom",
-        message: "제보 내용을 10자 이상 입력해 주세요.",
+        message: "체험·확인 내용을 20자 이상 입력해 주세요.",
         path: ["experienceNote"],
       });
     }
-    return;
-  }
-
-  if (!data.tags || data.tags.length < 1) {
-    ctx.addIssue({
-      code: "custom",
-      message: "가능한 환경 태그를 1개 이상 선택해 주세요.",
-      path: ["tags"],
-    });
-  }
-  if (data.experienceNote.length < 20) {
-    ctx.addIssue({
-      code: "custom",
-      message: "체험 내용을 20자 이상 입력해 주세요.",
-      path: ["experienceNote"],
-    });
-  }
-});
+  });
 
 export type ReportInput = z.infer<typeof reportSchema>;

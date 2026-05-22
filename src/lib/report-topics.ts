@@ -5,6 +5,7 @@ export const REPORT_TOPICS = [
   "hours",
   "prices",
   "links",
+  "location",
 ] as const;
 
 export type ReportTopic = (typeof REPORT_TOPICS)[number];
@@ -15,6 +16,7 @@ export const REPORT_TOPIC_LABELS: Record<ReportTopic, string> = {
   hours: "운영 · 시뮬 시간",
   prices: "드랍인 시뮬 비용",
   links: "인스타 · 네이버 예약",
+  location: "상호 · 주소 · 지도",
 };
 
 export const REPORT_TOPIC_HINTS: Record<ReportTopic, string> = {
@@ -23,6 +25,8 @@ export const REPORT_TOPIC_HINTS: Record<ReportTopic, string> = {
   hours: "요일·시간대(예: 토 10:00 시뮬)를 알려주세요.",
   prices: "싱글·더블·릴레이 드랍인 비용을 알려주세요.",
   links: "인스타그램, 네이버 예약 링크를 넣어주세요.",
+  location:
+    "상호명·주소·위도·경도가 바뀐 경우 모두 수정해 주세요. 증빙에 네이버/카카오 지도 링크를 꼭 포함해 주세요.",
 };
 
 export function isReportTopic(value: string | null): value is ReportTopic {

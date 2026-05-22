@@ -11,6 +11,7 @@ import {
   useDebouncedFilterKey,
   useDebouncedValue,
 } from "@/hooks/useDebouncedValue";
+import { radiusKmForRequest } from "@/lib/map-radius";
 import { venuesListSignature } from "@/lib/venue-list-signature";
 import type { VenueDTO } from "@/lib/types";
 
@@ -34,6 +35,7 @@ export default function HomePage() {
     tags: [],
     dropInOnly: false,
   });
+  const [radiusKm, setRadiusKm] = useState(15);
 
   const debouncedFilterKey = useDebouncedFilterKey(filtersKey(filters));
   const debouncedLat = useDebouncedValue(center.lat, 400);
@@ -53,7 +55,11 @@ export default function HomePage() {
     );
   }, []);
 
-  const fetchKey = `${debouncedLat},${debouncedLng},${debouncedFilterKey}`;
+  const parsedFilter = debouncedFilterKey.split("|");
+  const debouncedQ = parsedFilter[0] ?? "";
+  const effectiveRadius = radiusKmForRequest(Boolean(debouncedQ));
+
+  const fetchKey = `${debouncedLat},${debouncedLng},${effectiveRadius},${debouncedFilterKey}`;
 
   useEffect(() => {
     let cancelled = false;
@@ -64,9 +70,9 @@ export default function HomePage() {
     const params = new URLSearchParams({
       lat: String(debouncedLat),
       lng: String(debouncedLng),
+      radiusKm: String(effectiveRadius),
     });
-    const parsed = debouncedFilterKey.split("|");
-    const [q, venueType, tagsCsv, dropInOnly] = parsed;
+    const [q, venueType, tagsCsv, dropInOnly] = parsedFilter;
     if (q) params.set("q", q);
     if (venueType) params.set("venueType", venueType);
     if (tagsCsv) params.set("tags", tagsCsv);
@@ -77,10 +83,14 @@ export default function HomePage() {
       .then((data) => {
         if (cancelled) return;
         const next: VenueDTO[] = data.venues ?? [];
+        if (data.meta?.radiusKm) setRadiusKm(data.meta.radiusKm);
         const sig = venuesListSignature(next);
         if (sig !== venuesSigRef.current) {
           venuesSigRef.current = sig;
           setVenues(next);
+          setSelectedVenue((prev) =>
+            prev && next.some((v) => v.id === prev.id) ? prev : null
+          );
         }
       })
       .finally(() => {
@@ -90,7 +100,7 @@ export default function HomePage() {
     return () => {
       cancelled = true;
     };
-  }, [fetchKey]);
+  }, [fetchKey, effectiveRadius, debouncedFilterKey]);
 
   const handleMyLocation = useCallback(() => {
     navigator.geolocation?.getCurrentPosition((p) =>
@@ -133,6 +143,7 @@ export default function HomePage() {
           selectedId={null}
           onVenueSelect={setSelectedVenue}
           onMyLocation={handleMyLocation}
+          radiusKm={radiusKm}
           collapsed={sidebarCollapsed}
           onCollapsedChange={setSidebarCollapsed}
         />
@@ -143,6 +154,7 @@ export default function HomePage() {
           filters={filters}
           onFiltersChange={setFilters}
           venueCount={venues.length}
+          radiusKm={radiusKm}
           loading={listLoading}
           onOpenList={openList}
           onOpenFilter={openFilter}

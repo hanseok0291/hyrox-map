@@ -69,3 +69,17 @@ export function venueMatchesAllFilterTags(
 export function venueHasAnySled(venueTags: string[]): boolean {
   return venueTags.some(isSledTag);
 }
+
+/** 제보·DB에 남을 수 있는 태그 (레거시·시드 포함) */
+export function isReportableTag(tag: string): boolean {
+  return (
+    (SIMULATION_TAGS as readonly string[]).includes(tag) ||
+    (LEGACY_SIMULATION_TAGS as readonly string[]).includes(tag) ||
+    tag === "olympic_lifting"
+  );
+}
+
+export function sanitizeReportTags(tags: string[] | undefined): string[] {
+  if (!tags?.length) return [];
+  return tags.filter(isReportableTag);
+}

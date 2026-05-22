@@ -9,9 +9,18 @@ export async function GET(request: NextRequest) {
   }
 
   const status = request.nextUrl.searchParams.get("status");
+  const queue = request.nextUrl.searchParams.get("queue") ?? "pending";
+
+  const where = status
+    ? { status }
+    : queue === "all"
+      ? undefined
+      : queue === "done"
+        ? { status: { in: ["approved", "rejected"] } }
+        : { status: { in: ["submitted", "in_review", "needs_info"] } };
 
   const reports = await prisma.report.findMany({
-    where: status ? { status: status as never } : undefined,
+    where,
     orderBy: { createdAt: "desc" },
     take: 100,
   });
